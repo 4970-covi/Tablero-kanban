@@ -1,0 +1,98 @@
+
+.kanban-container {
+  padding: 20px;
+  background: #e0f7f7;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+
+.kanban-header {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  .priority {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: default;
+
+    &.low {
+      background: #4caf50;
+      color: white;
+    }
+
+    &.medium {
+      background: #ffeb3b;
+      color: black;
+    }
+
+    &.high {
+      background: #f44336;
+      color: white;
+    }
+  }
+}
+
+.kanban-board {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.column {
+  min-width: 200px;
+  background: white;
+  border: 2px solid #000;
+  border-radius: 6px;
+  padding: 10px;
+  flex-shrink: 0;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+
+  .column-title {
+    background: #00cccc;
+    color: white;
+    text-align: center;
+    padding: 6px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  .task {
+    background: #f0f0f0;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+}
+
+.input-container {
+    margin-bottom: 0px;
+    padding: 20px;
+    background: #e0f7f7;
+    font-family: Arial, sans-serif;
+    display: flex;             // <-- agregas esto
+    flex-direction: row;    // <-- y esto
+    gap: 12px;                 // <-- separa los inputs
+
+  
+  input {
+    width: 200px;
+    padding: 10px;
+    border: 2px solid gray;
+    border-radius: 6px;
+    font-size: 16px;
+    outline: none;
+
+    &::placeholder {
+      color: #888;
+    }
+  }
+}
+
+
