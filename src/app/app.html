@@ -1,96 +1,22 @@
-<!-- 🔹 FORMULARIO DE TAREA -->
-<div class="input-container">
-  <input type="text" placeholder="Nombre de la tarea" />
-
-  <input list="tiposTarea" placeholder="Tipo de tarea" />
-  <datalist id="tiposTarea">
-    <option value="Soporte"></option>
-    <option value="Cita" ></option>
-    <option value="Correo Electronico" ></option>
-    <option value="Desarrollo Interno" ></option>
-    <option value="Documento" ></option>
-    <option value="Implementacion" ></option>
-    <option value="Llamada de atencion" ></option>
-    <option value="Llamada telefonica" ></option>
-    <option value="Prospecto Economico" ></option>
-    <option value="Revision" ></option>
-    <option value="Tarea" ></option>
-    <option value="Ticket" ></option>
-  </datalist>
-
-  <input list="tiposEstado" placeholder="Tipos de Estado" />
-  <datalist id="tiposEstado">
-    <option value="Activo" ></option>
-    <option value="Atrasado" ></option>
-    <option value="Cerrado" ></option>
-    <option value="Entregado Cliente" ></option>
-    <option value="Pend Acept Client" ></option>
-    <option value="Pend Negociación" ></option>
-    <option value="Pend Facturación" ></option>
-    <option value="Revisión" ></option>
-  </datalist>
-
-  <input type="text" placeholder="No. Ref" />
-</div>
-
-<!-- 🔹 BOTONES DE PRIORIDAD -->
 <div class="kanban-container">
-  <div class="kanban-header">
-    <button class="priority low">Prioridad Baja</button>
-    <button class="priority medium">Prioridad Media</button>
-    <button class="priority high">Prioridad Alta</button>
-  </div>
+  <h2>Tablero Kanban - Tareas por Estado</h2>
 
-  <!-- 🔹 CHECKBOXES PARA MOSTRAR/OCULTAR ESTADOS -->
-  <h3>Mostrar columnas</h3>
-  <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-    <label *ngFor="let estado of estadosDisponibles">
-      <input
-        type="checkbox"
-        [checked]="estadosVisibles.includes(estado)"
-        (change)="toggleEstado(estado)"
-      />
-      {{ estado }}
-    </label>
-  </div>
-
-  <!-- 🔹 TABLERO KANBAN -->
   <div class="kanban-board">
-    <div
-      class="column"
-      *ngFor="let estado of estadosDisponibles"
-      [hidden]="!estadosVisibles.includes(estado)"
-    >
+    <!-- Recorremos cada estado único -->
+    <div class="column" *ngFor="let estado of obtenerEstadosUnicos()">
+      <!-- Título de la columna -->
       <div class="column-title">{{ estado }}</div>
 
-      <!-- Ejemplo de tarea estática por columna (puedes agregar dinámicas después) -->
-      <div class="task">Tarea ejemplo</div>
+      <!-- Tareas para este estado -->
+      <div
+        class="task"
+        *ngFor="let tarea of getTareasPorEstado(estado)"
+      >
+        <strong>ID:</strong> {{ tarea.iD_Tarea }}<br />
+        <strong>Usuario:</strong> {{ tarea.usuario_Tarea }}<br />
+        <strong>Referencia:</strong> {{ tarea.referencia }}<br />
+        <strong>Descripción:</strong> {{ tarea.descripcion }}
+      </div>
     </div>
   </div>
 </div>
-
-<!-- 🔹 FILTRO PARA API -->
-<div style="margin-top: 30px; margin-bottom: 20px;">
-  <input type="text" [(ngModel)]="filtroInput" placeholder="Ingrese filtro" />
-  <button (click)="cargarTareasPorFiltro()">Aceptar</button>
-</div>
-
-<!-- 🔹 TABLA DE RESULTADOS -->
-<table *ngIf="mostrarTabla" border="1" cellpadding="8">
-  <thead>
-    <tr>
-      <th>Referencia</th>
-      <th>Descripción</th>
-      <th>ID de Referencia</th>
-      <th>Estado</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let tarea of tareas">
-      <td>{{ tarea.referencia }}</td>
-      <td>{{ tarea.descripcion || 'Sin descripción' }}</td>
-      <td>{{ tarea.referencia_Id }}</td>
-      <td>{{ tarea.fDes_Estado_Objeto }}</td>
-    </tr>
-  </tbody>
-</table>
