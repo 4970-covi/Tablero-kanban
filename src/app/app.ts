@@ -13,6 +13,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class AppComponent {
   tareas: any[] = [];
+  rangoIni: number = 0;
+  rangoFin: number = 30;
 
   constructor(private http: HttpClient) {
     this.obtenerTareas();
@@ -23,8 +25,8 @@ export class AppComponent {
     const headers = new HttpHeaders({
       Authorization: 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhZG1pbiIsIm5iZiI6MTc1MDM0NjcyNCwiZXhwIjoxNzgxNDUwNzI0LCJpYXQiOjE3NTAzNDY3MjR9.NChZbZBfi3IZIVidfWujhmcwgtFYF4hDM1Xg7Z7z5J0',
       user: 'desa026',
-      rangoIni: '10',
-      rangoFin: '30'   // ← CORREGIDO
+      rangoIni: this.rangoIni.toString(),
+      rangoFin: this.rangoFin.toString()
     });
 
     this.http.get<any>(url, { headers }).subscribe(response => {
@@ -40,6 +42,20 @@ export class AppComponent {
     }, error => {
       console.error('❌ Error al obtener tareas:', error);
     });
+  }
+
+  mostrarMas(): void {
+    this.rangoIni += 30;
+    this.rangoFin += 30;
+    this.obtenerTareas();
+  }
+
+  regresar(): void {
+    if (this.rangoIni >= 30) {
+      this.rangoIni -= 30;
+      this.rangoFin -= 30;
+      this.obtenerTareas();
+    }
   }
 
   obtenerEstadosUnicos(): string[] {

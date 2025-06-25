@@ -1,5 +1,22 @@
 <div class="kanban-container">
-  <h2>Tablero Kanban - Tareas por Estado</h2>
+  <h2>Tablero de Tareas</h2>
+  
+
+<!-- Leyenda de Prioridades -->
+<div class="leyenda-prioridades">
+  <h3>Niveles de prioridad</h3>
+  <div class="leyenda-item">
+    
+    <span class="color-box color-critico"></span> Crítico (Nivel 1)
+  </div>
+  <div class="leyenda-item">
+    <span class="color-box color-alto"></span> Alto (Nivel 2)
+  </div>
+  <div class="leyenda-item">
+    <span class="color-box color-normal"></span> Normal (Nivel 3)
+  </div>
+</div>
+
 
   <div class="kanban-board">
     <!-- Recorremos cada estado único -->
@@ -11,12 +28,23 @@
       <div
         class="task"
         *ngFor="let tarea of getTareasPorEstado(estado)"
+        [ngClass]="{
+          'prioridad-1': tarea.nivel_Prioridad === 1,
+          'prioridad-2': tarea.nivel_Prioridad === 2,
+          'prioridad-3': tarea.nivel_Prioridad === 3
+        }"
       >
-        <strong>ID:</strong> {{ tarea.iD_Tarea }}<br />
-        <strong>Usuario:</strong> {{ tarea.usuario_Tarea }}<br />
-        <strong>Referencia:</strong> {{ tarea.referencia }}<br />
-        <strong>Descripción:</strong> {{ tarea.descripcion }}
+      <strong>Id Tarea:</strong> {{ tarea.iD_Tarea }}<br />  
+      <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
+      <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})
+         
       </div>
     </div>
+  </div>
+
+  <!-- Botones para cambiar de página -->
+  <div style="text-align: center; margin-top: 20px;">
+    <button (click)="regresar()" [disabled]="rangoIni === 0">← Regresar</button>
+    <button (click)="mostrarMas()">Mostrar más →</button>
   </div>
 </div>
