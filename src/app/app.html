@@ -1,48 +1,71 @@
 <div class="kanban-container">
-  <h2>Tablero de Tareas</h2>
-  
+  <!-- Título -->
+  <h2 style="text-align: center;">Tablero Kanban</h2>
 
-<!-- Leyenda de Prioridades -->
-<div class="leyenda-prioridades">
-  <h3>Niveles de prioridad</h3>
-  <div class="leyenda-item">
-    
-    <span class="color-box color-critico"></span> Crítico (Nivel 1)
-  </div>
-  <div class="leyenda-item">
-    <span class="color-box color-alto"></span> Alto (Nivel 2)
-  </div>
-  <div class="leyenda-item">
-    <span class="color-box color-normal"></span> Normal (Nivel 3)
-  </div>
-</div>
+  <!-- Filtros de prioridad como chips -->
+  <div class="legend" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+    <strong>Niveles de prioridad</strong>
 
+    <div
+      class="chip prioridad-1"
+      (click)="filtrarPorPrioridad('1')"
+      [class.selected]="prioridadSeleccionada === '1'">
+      ● Crítico (Nivel 1)
+    </div>
 
+    <div
+      class="chip prioridad-2"
+      (click)="filtrarPorPrioridad('2')"
+      [class.selected]="prioridadSeleccionada === '2'">
+      ● Alto (Nivel 2)
+    </div>
+
+    <div
+      class="chip prioridad-3"
+      (click)="filtrarPorPrioridad('3')"
+      [class.selected]="prioridadSeleccionada === '3'">
+      ● Normal (Nivel 3)
+    </div>
+
+    <div
+      class="chip prioridad-4"
+      (click)="filtrarPorPrioridad('4')"
+      [class.selected]="prioridadSeleccionada === '4'">
+      ● Bajo (Nivel 4)
+    </div>
+
+    <!-- Botón para limpiar filtro -->
+    <div
+      class="chip clear-filter"
+      (click)="filtrarPorPrioridad('')"
+      [class.selected]="prioridadSeleccionada === ''">
+      ✖ Todas
+    </div>
+  </div>
+
+  <!-- Kanban por estado -->
   <div class="kanban-board">
-    <!-- Recorremos cada estado único -->
     <div class="column" *ngFor="let estado of obtenerEstadosUnicos()">
-      <!-- Título de la columna -->
       <div class="column-title">{{ estado }}</div>
 
-      <!-- Tareas para este estado -->
       <div
         class="task"
         *ngFor="let tarea of getTareasPorEstado(estado)"
         [ngClass]="{
           'prioridad-1': tarea.nivel_Prioridad === 1,
           'prioridad-2': tarea.nivel_Prioridad === 2,
-          'prioridad-3': tarea.nivel_Prioridad === 3
+          'prioridad-3': tarea.nivel_Prioridad === 3,
+          'prioridad-4': tarea.nivel_Prioridad === 4
         }"
       >
-      <strong>Id Tarea:</strong> {{ tarea.iD_Tarea }}<br />  
-      <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
-      <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})
-         
+        <strong>Id Tarea:</strong> {{ tarea.iD_Tarea }}<br />
+        <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
+        <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})
       </div>
     </div>
   </div>
 
-  <!-- Botones para cambiar de página -->
+  <!-- Botones para paginación -->
   <div style="text-align: center; margin-top: 20px;">
     <button (click)="regresar()" [disabled]="rangoIni === 0">← Regresar</button>
     <button (click)="mostrarMas()">Mostrar más →</button>
