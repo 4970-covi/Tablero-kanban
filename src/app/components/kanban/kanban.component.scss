@@ -1,0 +1,147 @@
+.kanban-container {
+  padding: 20px;
+  background-image: url('https://images.squarespace-cdn.com/content/v1/5647b7bbe4b025f4531aa0fd/1452098686293-MINY1AA5ZKI3WJBOSE32/gradientbackground.jpg?format=1500w');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+
+/* Título del tablero */
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 28px;
+  color: #333;
+}
+
+/* Contenedor de columnas */
+.kanban-board {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+/* Estilo de columna */
+.column {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px;
+  min-width: 280px;
+  max-height: 600px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.column:hover {
+  transform: translateY(-3px);
+}
+
+/* Encabezado de columna (sticky) */
+.column-title {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #00bcd4;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Tarjeta de tarea base */
+.task {
+  background: #ffffff;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid #007bff;
+  transition: transform 0.2s ease, background-color 0.3s;
+  cursor: pointer;
+}
+
+.task:hover {
+  transform: scale(1.01);
+}
+
+/* Colores según prioridad */
+.prioridad-1 {
+  border-left: 5px solid #e53935;
+  background-color: #ffebee;
+}
+
+.prioridad-2 {
+  border-left: 5px solid #fbc02d;
+  background-color: #fffde7;
+}
+
+.prioridad-3 {
+  border-left: 5px solid #43a047;
+  background-color: #e8f5e9;
+}
+
+.prioridad-4 {
+  border-left: 5px solid #2196f3;         // azul
+  background-color: #e3f2fd;              // azul claro
+}
+
+/* Botones de paginación */
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: none;
+  background-color: #00bcd4;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover:not([disabled]) {
+  background-color: #0097a7;
+}
+
+button[disabled] {
+  background-color: #b0bec5;
+  cursor: not-allowed;
+}
+//Niveles de prioridad
+.chip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  user-select: none;
+
+  &.prioridad-1 { background-color: #e53935; }
+  &.prioridad-2 { background-color: #fbc02d; color: black; }
+  &.prioridad-3 { background-color: #43a047; }
+  &.prioridad-4 { background-color: #2196f3; }
+
+  &.clear-filter {
+    background-color: #888;
+    color: white;
+  }
+
+  &.selected {
+    outline: 3px solid black;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}

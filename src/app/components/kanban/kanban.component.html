@@ -1,0 +1,70 @@
+<div class="kanban-container">
+  
+  <h2 style="text-align: center;">Tablero Kanban</h2>
+
+  <div class="legend" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+    <strong>Niveles de prioridad</strong>
+
+    <div
+      class="chip prioridad-1"
+      (click)="filtrarPorPrioridad(Prioridad.Critico)"
+      [class.selected]="prioridadSeleccionada === Prioridad.Critico">
+      ● Crítico (Nivel 1)
+    </div>
+
+    <div
+      class="chip prioridad-2"
+      (click)="filtrarPorPrioridad(Prioridad.Alto)"
+      [class.selected]="prioridadSeleccionada === Prioridad.Alto">
+      ● Alto (Nivel 2)
+    </div>
+
+    <div
+      class="chip prioridad-3"
+      (click)="filtrarPorPrioridad(Prioridad.Normal)"
+      [class.selected]="prioridadSeleccionada === Prioridad.Normal">
+      ● Normal (Nivel 3)
+    </div>
+
+    <div
+      class="chip prioridad-4"
+      (click)="filtrarPorPrioridad(Prioridad.Bajo)"
+      [class.selected]="prioridadSeleccionada === Prioridad.Bajo">
+      ● Bajo (Nivel 4)
+    </div>
+
+    <div
+      class="chip clear-filter"
+      (click)="filtrarPorPrioridad(null)"
+      [class.selected]="prioridadSeleccionada === null">
+      ✖ Todas
+    </div>
+  </div>
+
+  <div class="kanban-board">
+    <div class="column" *ngFor="let estado of obtenerEstadosUnicos()">
+      <div class="column-title">{{ estado }}</div>
+
+      <div
+        class="task"
+        *ngFor="let tarea of getTareasPorEstado(estado)"
+        [ngClass]="{
+          'prioridad-1': tarea.nivel_Prioridad === Prioridad.Critico,
+          'prioridad-2': tarea.nivel_Prioridad === Prioridad.Alto,
+          'prioridad-3': tarea.nivel_Prioridad === Prioridad.Normal,
+          'prioridad-4': tarea.nivel_Prioridad === Prioridad.Bajo
+        }"
+      >
+        <strong>Id Tarea:</strong> {{ tarea.iD_Tarea }}<br />
+        <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
+        <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})<br />
+        <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px;">
+    <button (click)="regresar()" [disabled]="rangoIni === 0">← Regresar</button>
+    <button (click)="mostrarMas()">Mostrar más →</button>
+  </div>
+</div>
