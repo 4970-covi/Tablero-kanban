@@ -1,4 +1,4 @@
-export interface ResponseInterface {
-    storeProcedure: string,
-    data: any,
+export interface ResponseInterface<T = any> {
+  storeProcedure: string;
+  data: T;
 }

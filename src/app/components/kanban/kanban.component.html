@@ -1,46 +1,48 @@
 <div class="kanban-container">
-  
+
+  <button (click)="testFiltroRef()">Test Filtro</button>
+  <!-- Título -->
   <h2 style="text-align: center;">Tablero Kanban</h2>
 
-  <div class="legend" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-    <strong>Niveles de prioridad</strong>
+  <!-- 🔍 Filtros combinados -->
+  <div class="filtros" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+    <!-- Estado -->
+    <select [(ngModel)]="estadoSeleccionado" (change)="seleccionarEstado(estadoSeleccionado)">
+      <option value="">Todos los estados</option>
+      <option *ngFor="let estado of estadosDisponibles" [value]="estado.descripcion">
+        {{ estado.descripcion }}
+      </option>
+    </select>
 
-    <div
-      class="chip prioridad-1"
-      (click)="filtrarPorPrioridad(Prioridad.Critico)"
-      [class.selected]="prioridadSeleccionada === Prioridad.Critico">
-      ● Crítico (Nivel 1)
-    </div>
+    <!-- Tipo de Tarea -->
+    <select [(ngModel)]="tipoSeleccionado" (change)="seleccionarTipo(tipoSeleccionado)">
+      <option [ngValue]="null">Todos los tipos</option>
+      <option *ngFor="let tipo of tiposTareaDisponibles" [ngValue]="tipo.tipo_Tarea">
+        {{ tipo.descripcion }}
+      </option>
+    </select>
 
-    <div
-      class="chip prioridad-2"
-      (click)="filtrarPorPrioridad(Prioridad.Alto)"
-      [class.selected]="prioridadSeleccionada === Prioridad.Alto">
-      ● Alto (Nivel 2)
-    </div>
+    <!-- Prioridad -->
+    <select [(ngModel)]="prioridadSeleccionada" (change)="seleccionarPrioridad(prioridadSeleccionada)">
+      <option [ngValue]="null">Todas las prioridades</option>
+      <option *ngFor="let prioridad of prioridadesDisponibles" [ngValue]="prioridad.nivel_Prioridad">
+        {{ prioridad.nombre }}
+      </option>
+    </select>
 
-    <div
-      class="chip prioridad-3"
-      (click)="filtrarPorPrioridad(Prioridad.Normal)"
-      [class.selected]="prioridadSeleccionada === Prioridad.Normal">
-      ● Normal (Nivel 3)
-    </div>
+    <input
+      type="text"
+      placeholder="Buscar por referencia..."
+      [(ngModel)]="filtroReferencia"
+      (input)="aplicarFiltro()" />
 
-    <div
-      class="chip prioridad-4"
-      (click)="filtrarPorPrioridad(Prioridad.Bajo)"
-      [class.selected]="prioridadSeleccionada === Prioridad.Bajo">
-      ● Bajo (Nivel 4)
-    </div>
 
-    <div
-      class="chip clear-filter"
-      (click)="filtrarPorPrioridad(null)"
-      [class.selected]="prioridadSeleccionada === null">
-      ✖ Todas
-    </div>
+
+    <!-- Botón limpiar filtros -->
+    <button (click)="limpiarFiltros()">Limpiar Filtros</button>
   </div>
 
+  <!-- 📌 Kanban por estado -->
   <div class="kanban-board">
     <div class="column" *ngFor="let estado of obtenerEstadosUnicos()">
       <div class="column-title">{{ estado }}</div>
@@ -48,23 +50,21 @@
       <div
         class="task"
         *ngFor="let tarea of getTareasPorEstado(estado)"
-        [ngClass]="{
-          'prioridad-1': tarea.nivel_Prioridad === Prioridad.Critico,
-          'prioridad-2': tarea.nivel_Prioridad === Prioridad.Alto,
-          'prioridad-3': tarea.nivel_Prioridad === Prioridad.Normal,
-          'prioridad-4': tarea.nivel_Prioridad === Prioridad.Bajo
-        }"
+        [ngStyle]="{ 'background-color': tarea.backColor || '#fff' }"
       >
-        <strong>Id Tarea:</strong> {{ tarea.iD_Tarea }}<br />
+        <strong>ID:</strong> {{ tarea.iD_Tarea }}<br />
         <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
-        <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})<br />
+        <strong>Tipo:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br />
+        <strong>Prioridad:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
+        <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }}<br />
         <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}
       </div>
     </div>
   </div>
 
+  <!-- 🔁 Paginación -->
   <div style="text-align: center; margin-top: 20px;">
-    <button (click)="regresar()" [disabled]="rangoIni === 0">← Regresar</button>
+    <button (click)="regresar()">← Regresar</button>
     <button (click)="mostrarMas()">Mostrar más →</button>
   </div>
 </div>
