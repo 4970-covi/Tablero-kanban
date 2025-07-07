@@ -1,11 +1,10 @@
 <div class="kanban-container">
 
-  <button (click)="testFiltroRef()">Test Filtro</button>
-  <!-- Título -->
   <h2 style="text-align: center;">Tablero Kanban</h2>
 
   <!-- 🔍 Filtros combinados -->
   <div class="filtros" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+    
     <!-- Estado -->
     <select [(ngModel)]="estadoSeleccionado" (change)="seleccionarEstado(estadoSeleccionado)">
       <option value="">Todos los estados</option>
@@ -14,7 +13,7 @@
       </option>
     </select>
 
-    <!-- Tipo de Tarea -->
+    <!-- Tipo -->
     <select [(ngModel)]="tipoSeleccionado" (change)="seleccionarTipo(tipoSeleccionado)">
       <option [ngValue]="null">Todos los tipos</option>
       <option *ngFor="let tipo of tiposTareaDisponibles" [ngValue]="tipo.tipo_Tarea">
@@ -23,48 +22,56 @@
     </select>
 
     <!-- Prioridad -->
-    <select [(ngModel)]="prioridadSeleccionada" (change)="seleccionarPrioridad(prioridadSeleccionada)">
-      <option [ngValue]="null">Todas las prioridades</option>
+    
+    <select id="prioridad" [(ngModel)]="prioridadSeleccionada" (change)="aplicarFiltro()">
+      <option [ngValue]="null">Filtrar por prioridad</option>
       <option *ngFor="let prioridad of prioridadesDisponibles" [ngValue]="prioridad.nivel_Prioridad">
         {{ prioridad.nombre }}
       </option>
     </select>
 
+    <!-- Buscar por texto de referencia -->
     <input
       type="text"
       placeholder="Buscar por referencia..."
       [(ngModel)]="filtroReferencia"
       (input)="aplicarFiltro()" />
 
-
-
-    <!-- Botón limpiar filtros -->
     <button (click)="limpiarFiltros()">Limpiar Filtros</button>
   </div>
 
-  <!-- 📌 Kanban por estado -->
+  <!-- 📌 Kanban -->
   <div class="kanban-board">
     <div class="column" *ngFor="let estado of obtenerEstadosUnicos()">
       <div class="column-title">{{ estado }}</div>
 
-      <div
-        class="task"
-        *ngFor="let tarea of getTareasPorEstado(estado)"
-        [ngStyle]="{ 'background-color': tarea.backColor || '#fff' }"
-      >
-        <strong>ID:</strong> {{ tarea.iD_Tarea }}<br />
-        <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
-        <strong>Tipo:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br />
-        <strong>Prioridad:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
-        <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }}<br />
-        <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}
+      <div class="task" *ngFor="let tarea of getTareasPorEstado(estado)">
+        
+        <!-- Banda superior con color de prioridad -->
+        <div class="task-prioridad" [ngStyle]="{ 'background-color': getColorPrioridad(tarea.nivel_Prioridad) }"></div>
+
+        <!-- Contenido -->
+        <div class="task-content">
+          <strong>ID:</strong> {{ tarea.iD_Tarea }}<br />
+          <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
+          <strong>Tipo:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br />
+          <strong>Prioridad:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
+          <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }}<br />
+          <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}
+        </div>
       </div>
     </div>
   </div>
 
   <!-- 🔁 Paginación -->
-  <div style="text-align: center; margin-top: 20px;">
-    <button (click)="regresar()">← Regresar</button>
-    <button (click)="mostrarMas()">Mostrar más →</button>
-  </div>
+  <div class="pagination" style="text-align: center; margin-top: 20px;">
+  <button (click)="cambiarPagina(paginaActual - 1)" [disabled]="paginaActual === 1">⬅ Anterior</button>
+
+  <button *ngFor="let p of paginasVisibles"
+          [disabled]="p === paginaActual"
+          (click)="p > 0 && cambiarPagina(p)">
+    {{ p > 0 ? p : '...' }}
+  </button>
+
+  <button (click)="cambiarPagina(paginaActual + 1)" [disabled]="paginaActual === paginasTotales">Siguiente ➡</button>
 </div>

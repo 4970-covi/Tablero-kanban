@@ -30,6 +30,11 @@ export class Kanban implements OnInit {
   tiposTareaDisponibles: TipoTareaInterface[] = [];
   referenciasDisponibles: ReferenciaInterface[] = [];
 
+  totalRegistros: number = 0;
+  tareasPorPagina: number = 30;
+  paginaActual: number = 1;
+  paginasTotales: number = 0;
+  paginasVisibles: number[] = [];
 
   filtroReferencia: string = '';
   estadoSeleccionado: string = '';
@@ -50,114 +55,53 @@ export class Kanban implements OnInit {
     this.obtenerTareas();
   }
 
-
-  refSelectTest:any = undefined;
-
-  referenciasTes: any[] = [
-    {
-
-      referencia: 984,
-      descripcion: "Ref1",
-    },
-    {
-
-      referencia: 1,
-      descripcion: "ref59",
-    },
-    {
-
-      referencia: 944,
-      descripcion: "Ref144",
-    }
-  ];
-
-
-
-  tareasTest: any[] = [
-    {
-      nombre:"Traea1",
-      referencia: 1,
-      iD_Referencia: "ref59",
-    },
-    {
-      nombre:"Traea1",
-
-      referencia: 17,
-      iD_Referencia: "ref59",
-    },
-    {
-      nombre:"Traea1",
-
-      referencia: 41,
-      iD_Referencia: "ref59",
-    }
-    ,
-    {
-      nombre:"Traea17",
-
-      referencia: 1,
-      iD_Referencia: "ref59",
-    }
-    ,
-    {
-      nombre:"Traea14",
-
-      referencia: 1272,
-      iD_Referencia: "ref522",
-    }
-  ];
-
-
-  testFiltroRef(){
-    //la referencia que el usuario selecciona
-      this.refSelectTest = this.referenciasTes[0];
-
-      let taskSelect:any[] = [];
-
-
-      //recorremos las tareas que se estan viendo 
-      this.tareasTest.forEach(element => {
-
-
-        //evaluar si hay alguna tarea con la referencia seleccionada
-        if(element.referencia == this.refSelectTest!.referencia){
-          //asigamos las tareas encontradas 
-          taskSelect.push(element);
-        }
-      });
-      
-
-      console.log(taskSelect);
-      
-  }
-
-
-  //tareas al cargar mi app
   obtenerTareas(): void {
-    this.taskService.getTodasLasTareas(
-      this.token,
-      this.pagination.getRangoIni(),
-      this.pagination.getRangoFin()
-    ).subscribe({
-      next: (res: { data: TaskInterface[]; }) => {
+    const rangoIni = (this.paginaActual - 1) * this.tareasPorPagina;
+    const rangoFin = this.paginaActual * this.tareasPorPagina;
+
+    this.taskService.getTodasLasTareas(this.token, rangoIni, rangoFin).subscribe({
+      next: (res: { data: TaskInterface[] }) => {
         this.tareas = res.data;
+        this.totalRegistros = res.data[0]?.registros || 0;
+        this.paginasTotales = Math.ceil(this.totalRegistros / this.tareasPorPagina);
+        this.generarPaginacion();
         this.aplicarFiltro();
       },
-      error: (err: any) => {
-        console.error('Error al obtener todas las tareas:', err);
-      }
+      error: err => console.error('Error al obtener tareas:', err)
     });
   }
 
+  generarPaginacion(): void {
+    const total = this.paginasTotales;
+    const actual = this.paginaActual;
+    const visible: number[] = [];
 
-  // filtrado
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) visible.push(i);
+    } else {
+      if (actual <= 4) {
+        visible.push(1, 2, 3, 4, 5, -1, total);
+      } else if (actual >= total - 3) {
+        visible.push(1, -1, total - 4, total - 3, total - 2, total - 1, total);
+      } else {
+        visible.push(1, -1, actual - 1, actual, actual + 1, -1, total);
+      }
+    }
+
+    this.paginasVisibles = visible;
+  }
+
+  cambiarPagina(pagina: number): void {
+    if (pagina < 1 || pagina > this.paginasTotales) return;
+    this.paginaActual = pagina;
+    this.obtenerTareas();
+  }
+
   aplicarFiltro(): void {
     this.tareasFiltradas = this.tareas.filter(t => {
       const coincideEstado = this.estadoSeleccionado ? t.tarea_Estado === this.estadoSeleccionado : true;
       const coincidePrioridad = this.prioridadSeleccionada != null ? t.nivel_Prioridad === this.prioridadSeleccionada : true;
       const coincideTipo = this.tipoSeleccionado != null ? t.tipo_Tarea === this.tipoSeleccionado : true;
-
-      // NUEVA LÓGICA DE FILTRO POR TEXTO DE REFERENCIA
       const coincideReferencia = this.filtroReferencia.trim()
         ? t.descripcion_Referencia.toLowerCase().includes(this.filtroReferencia.toLowerCase())
         : true;
@@ -166,14 +110,10 @@ export class Kanban implements OnInit {
     });
   }
 
-
-  //funcion para cargar los filtros
   cargarFiltros(): void {
     this.taskService.getEstados(this.token).subscribe(res => this.estadosDisponibles = res.data);
     this.taskService.getPrioridades(this.token).subscribe(res => this.prioridadesDisponibles = res.data);
     this.taskService.getTiposTarea(this.token).subscribe(res => this.tiposTareaDisponibles = res.data);
-
-
   }
 
   buscarReferencias(): void {
@@ -193,40 +133,24 @@ export class Kanban implements OnInit {
     this.aplicarFiltro();
   }
 
-
-
-  regresar(): void {
-    this.pagination.retroceder();
-    this.obtenerTareas();
-  }
-
-
-  mostrarMas(): void {
-    this.pagination.avanzar();
-    this.obtenerTareas();
-  }
-
-  //Agrupar tareas por estado
   obtenerEstadosUnicos(): string[] {
     return Array.from(new Set(this.tareasFiltradas.map(t => t.tarea_Estado)));
   }
 
-  // tareas por estado (usado por *ngFor en HTML)
   getTareasPorEstado(estado: string): TaskInterface[] {
     return this.tareasFiltradas.filter(t => t.tarea_Estado === estado);
   }
 
-  // filtrado por estado
   seleccionarEstado(estado: string): void {
     this.estadoSeleccionado = estado;
     this.aplicarFiltro();
   }
-  // filtrado por nivel 
+
   seleccionarPrioridad(nivel: number | null): void {
     this.prioridadSeleccionada = nivel;
     this.aplicarFiltro();
   }
-  //filtrado por tipo de tarea
+
   seleccionarTipo(tipo: number | null): void {
     this.tipoSeleccionado = tipo;
     this.aplicarFiltro();
@@ -237,11 +161,17 @@ export class Kanban implements OnInit {
     this.aplicarFiltro();
   }
 
+  getColorPrioridad(nivel: number): string {
+    const prioridad = this.prioridadesDisponibles.find(p => p.nivel_Prioridad === nivel);
+    return prioridad?.backColor || '#ffffff';
+  }
+
   limpiarFiltros(): void {
     this.estadoSeleccionado = '';
     this.prioridadSeleccionada = null;
     this.tipoSeleccionado = null;
     this.referenciaSeleccionada = null;
+    this.filtroReferencia = '';
     this.aplicarFiltro();
   }
 }

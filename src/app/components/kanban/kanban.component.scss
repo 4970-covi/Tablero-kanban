@@ -58,41 +58,23 @@ h2 {
 
 /* Tarjeta de tarea base */
 .task {
-  background: #ffffff;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border-left: 5px solid #007bff;
-  transition: transform 0.2s ease, background-color 0.3s;
-  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 10px 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.task:hover {
-  transform: scale(1.01);
+.task-prioridad {
+  height: 8px;
+  width: 100%;
 }
 
-/* Colores según prioridad */
-.prioridad-1 {
-  border-left: 5px solid #e53935;
-  background-color: #ffebee;
+.task-content {
+  padding: 10px;
+  background-color: #fff;
 }
 
-.prioridad-2 {
-  border-left: 5px solid #fbc02d;
-  background-color: #fffde7;
-}
-
-.prioridad-3 {
-  border-left: 5px solid #43a047;
-  background-color: #e8f5e9;
-}
-
-.prioridad-4 {
-  border-left: 5px solid #2196f3;         // azul
-  background-color: #e3f2fd;              // azul claro
-}
 
 /* Botones de paginación */
 button {
