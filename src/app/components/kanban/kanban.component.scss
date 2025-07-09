@@ -8,8 +8,7 @@
   font-family: Arial, sans-serif;
 }
 
-
-/* Título del tablero */
+/* Título */
 h2 {
   text-align: center;
   margin-bottom: 20px;
@@ -17,7 +16,7 @@ h2 {
   color: #333;
 }
 
-/* Contenedor de columnas */
+/* Tablero Kanban */
 .kanban-board {
   display: flex;
   gap: 20px;
@@ -25,7 +24,7 @@ h2 {
   padding-bottom: 10px;
 }
 
-/* Estilo de columna */
+/* Columnas */
 .column {
   background: #ffffff;
   border-radius: 12px;
@@ -42,7 +41,6 @@ h2 {
   transform: translateY(-3px);
 }
 
-/* Encabezado de columna (sticky) */
 .column-title {
   position: sticky;
   top: 0;
@@ -56,13 +54,13 @@ h2 {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Tarjeta de tarea base */
+/* Tareas */
 .task {
   border: 1px solid #ccc;
   border-radius: 6px;
   overflow: hidden;
   margin: 10px 0;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .task-prioridad {
@@ -75,29 +73,35 @@ h2 {
   background-color: #fff;
 }
 
+/* Paginación */
+.paginacion {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
 
-/* Botones de paginación */
-button {
-  padding: 10px 20px;
-  margin: 10px;
-  font-weight: bold;
-  border-radius: 8px;
-  border: none;
-  background-color: #00bcd4;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  button {
+    padding: 0.5rem 0.8rem;
+    border: 1px solid #ccc;
+    background-color: white;
+    cursor: pointer;
+    border-radius: 4px;
+
+    &.activa {
+      background-color: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+  }
+
+  .separador {
+    padding: 0.5rem;
+    color: #888;
+  }
 }
 
-button:hover:not([disabled]) {
-  background-color: #0097a7;
-}
-
-button[disabled] {
-  background-color: #b0bec5;
-  cursor: not-allowed;
-}
-//Niveles de prioridad
+/* Chips de prioridad */
 .chip {
   padding: 6px 12px;
   border-radius: 20px;
@@ -106,7 +110,7 @@ button[disabled] {
   cursor: pointer;
   color: white;
   transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   user-select: none;
 
   &.prioridad-1 { background-color: #e53935; }
@@ -127,3 +131,109 @@ button[disabled] {
     transform: scale(1.05);
   }
 }
+
+/* Input referencia y ventana emergente */
+.contenedor-input-referencia {
+  position: relative;
+  display: inline-block;
+  width: 400px;
+}
+
+.ventana-resultados {
+  position: absolute;
+  top: 110%; // bajarla un poco más
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5rem;
+  margin-top: 5px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.cabecera-ventana {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .cerrar-ventana {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #888;
+    padding: 0;
+
+    &:hover {
+      color: #e74c3c;
+    }
+  }
+}
+
+.lista-referencias {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  .opcion-referencia {
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background-color: #f0f4ff;
+    }
+
+    strong {
+      color: #007bff;
+    }
+
+    small {
+      display: block;
+      color: #666;
+      margin-top: 4px;
+    }
+  }
+
+  .opcion-referencia:last-child {
+    border-bottom: none;
+  }
+}
+.tab-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  button {
+    padding: 10px 16px;
+    border: none;
+    background-color: #eee;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s ease;
+
+    &.active-tab {
+      background-color: #007bff;
+      color: white;
+    }
+
+    &:hover {
+      background-color: #ddd;
+    }
+  }
+}
+

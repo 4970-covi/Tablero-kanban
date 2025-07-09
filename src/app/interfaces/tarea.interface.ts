@@ -1,4 +1,5 @@
-export interface TaskInterface {
+export interface TareaInterface {
+   
     id:                         number;
     iD_Tarea:                   number;
     usuario_Creador:            string;
@@ -8,6 +9,7 @@ export interface TaskInterface {
     fecha_Final:                Date;
     referencia:                 number;
     iD_Referencia:              string;
+    referencia_Id:              string;
     descripcion_Referencia:     string;
     tarea_Observacion_1:        string;
     tarea_Fecha_Ini:            Date;

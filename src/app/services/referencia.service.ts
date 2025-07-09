@@ -10,16 +10,17 @@ export class ReferenciaService {
 
   constructor(private http: HttpClient) {}
 
-  getReferencias(token: string, filtro: string, empresa: string): Observable<ResponseInterface<ReferenciaInterface[]>> {
-    const headers = new HttpHeaders({ Authorization: 'bearer ' + token });
-    const params = new HttpParams()
-      .set('filtro', filtro)
-      .set('empresa', empresa)
-      .set('user', 'desa026');
+  buscarPorTexto(token: string, texto: string, user: string, empresa: string): Observable<ResponseInterface<ReferenciaInterface[]>> {
+  const headers = new HttpHeaders({
+    Authorization: 'bearer ' + token,
+    user: user,
+    filtro: texto,
+    empresa: empresa
+  });
 
-    return this.http.get<ResponseInterface<ReferenciaInterface[]>>(`${this.baseUrl}Tareas/idReferencia`, {
-      headers,
-      params
-    });
-  }
+  return this.http.get<ResponseInterface<ReferenciaInterface[]>>(
+    'http://localhost:9085/api/Tareas/idReferencia',
+    { headers }
+  );
+}
 }

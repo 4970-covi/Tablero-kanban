@@ -2,12 +2,12 @@ import { ApplicationConfig, provideZoneChangeDetection, provideBrowserGlobalErro
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, Routes } from '@angular/router';
 
-import { Kanban } from './components/kanban/kanban.component';
+import { KanbanComponent } from './components/kanban/kanban.component';
 
  // asegúrate que este sea el path correcto
 
 const routes: Routes = [
-  { path: '', component: Kanban },
+  { path: '', component: KanbanComponent },
 ];
 
 export const appConfig: ApplicationConfig = {

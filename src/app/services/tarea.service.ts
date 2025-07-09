@@ -1,39 +1,38 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { TaskInterface } from '../interfaces/task.interface';
+import { TareaInterface } from '../interfaces/tarea.interface';
 import { ResponseInterface } from '../interfaces/response.interface';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class TareaService {
-  private baseUrl = 'http://localhost:9085/api/';
+
+  private urlBase = 'http://localhost:9085/api/Tareas';
 
   constructor(private http: HttpClient) {}
 
-  private getHeaders(token: string, user = 'desa026', rangoIni = 0, rangoFin = 30) {
-    return new HttpHeaders({
-      Authorization: 'bearer ' + token,
-      user,
-      rangoIni: rangoIni.toString(),
-      rangoFin: rangoFin.toString()
+  getTareasCreadas(token: string, usuario: string, rangoIni: number, rangoFin: number): Observable<{ data: TareaInterface[] }> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      user: usuario,
+      rangoini: rangoIni.toString(),
+      rangofin: rangoFin.toString()
     });
+
+    return this.http.get<{ data: TareaInterface[] }>(`${this.urlBase}/creadas`, { headers });
   }
 
-  getTodas(token: string, rangoIni: number, rangoFin: number): Observable<ResponseInterface<TaskInterface[]>> {
-    return this.http.get<ResponseInterface<TaskInterface[]>>(`${this.baseUrl}Tareas/todas`, {
-      headers: this.getHeaders(token, 'desa026', rangoIni, rangoFin)
+  // Ya deberías tener este para la pestaña "todas"
+  getTodas(token: string, rangoIni: number, rangoFin: number): Observable<{ data: TareaInterface[] }> {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+      user: 'desa026', // o variable según sesión
+      rangoini: rangoIni.toString(),
+      rangofin: rangoFin.toString()
     });
-  }
 
-  getCreadas(token: string, rangoIni: number, rangoFin: number): Observable<ResponseInterface<TaskInterface[]>> {
-    return this.http.get<ResponseInterface<TaskInterface[]>>(`${this.baseUrl}Tareas/creadas`, {
-      headers: this.getHeaders(token, 'desa026', rangoIni, rangoFin)
-    });
-  }
-
-  getAsignadas(token: string, rangoIni: number, rangoFin: number): Observable<ResponseInterface<TaskInterface[]>> {
-    return this.http.get<ResponseInterface<TaskInterface[]>>(`${this.baseUrl}Tareas/asignadas`, {
-      headers: this.getHeaders(token, 'desa026', rangoIni, rangoFin)
-    });
+    return this.http.get<{ data: TareaInterface[] }>(`${this.urlBase}/todas`, { headers });
   }
 }

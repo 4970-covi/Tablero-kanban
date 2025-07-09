@@ -2,9 +2,24 @@
 
   <h2 style="text-align: center;">Tablero Kanban</h2>
 
-  <!-- 🔍 Filtros combinados -->
-  <div class="filtros" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-    
+  <!-- 🔖 Navegación de pestañas -->
+  <div class="tab-container">
+    <button
+      [class.active-tab]="vistaActiva === 'todas'"
+      (click)="cambiarVista('todas')"
+    >
+      Todas las tareas
+    </button>
+    <button
+      [class.active-tab]="vistaActiva === 'creadas'"
+      (click)="cambiarVista('creadas')"
+    >
+      Tareas creadas
+    </button>
+  </div>
+
+  <!-- 🔍 Filtros (solo si está en 'todas') -->
+  <div *ngIf="vistaActiva === 'todas'" class="filtros" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
     <!-- Estado -->
     <select [(ngModel)]="estadoSeleccionado" (change)="seleccionarEstado(estadoSeleccionado)">
       <option value="">Todos los estados</option>
@@ -22,7 +37,6 @@
     </select>
 
     <!-- Prioridad -->
-    
     <select id="prioridad" [(ngModel)]="prioridadSeleccionada" (change)="aplicarFiltro()">
       <option [ngValue]="null">Filtrar por prioridad</option>
       <option *ngFor="let prioridad of prioridadesDisponibles" [ngValue]="prioridad.nivel_Prioridad">
@@ -30,48 +44,81 @@
       </option>
     </select>
 
-    <!-- Buscar por texto de referencia -->
-    <input
-      type="text"
-      placeholder="Buscar por referencia..."
-      [(ngModel)]="filtroReferencia"
-      (input)="aplicarFiltro()" />
+    <!-- Referencia -->
+    <div class="contenedor-input-referencia">
+      <input
+        type="text"
+        [(ngModel)]="filtroReferencia"
+        (input)="buscarPorReferencia()"
+        (keydown.enter)="confirmarReferenciaConEnter()"
+        placeholder="Buscar referencia..."
+      />
+      <button (click)="limpiarFiltros()">Limpiar Filtros</button>
 
-    <button (click)="limpiarFiltros()">Limpiar Filtros</button>
-  </div>
-
-  <!-- 📌 Kanban -->
-  <div class="kanban-board">
-    <div class="column" *ngFor="let estado of obtenerEstadosUnicos()">
-      <div class="column-title">{{ estado }}</div>
-
-      <div class="task" *ngFor="let tarea of getTareasPorEstado(estado)">
-        
-        <!-- Banda superior con color de prioridad -->
-        <div class="task-prioridad" [ngStyle]="{ 'background-color': getColorPrioridad(tarea.nivel_Prioridad) }"></div>
-
-        <!-- Contenido -->
-        <div class="task-content">
-          <strong>ID:</strong> {{ tarea.iD_Tarea }}<br />
-          <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
-          <strong>Tipo:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br />
-          <strong>Prioridad:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
-          <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }}<br />
-          <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}
+      <!-- Ventana emergente de resultados -->
+      <div *ngIf="mostrarResultadosFlotantes" class="ventana-resultados">
+        <div class="cabecera-ventana">
+          <h4>Resultados de referencia</h4>
+          <button (click)="mostrarResultadosFlotantes = false" class="cerrar-ventana">✖</button>
         </div>
+        <ul class="lista-referencias">
+          <li
+            *ngFor="let r of resultadosReferencia"
+            (click)="filtrarPorReferenciaSeleccionada(r)"
+            class="opcion-referencia"
+          >
+            <strong>{{ r.referencia }}</strong> – {{ r.descripcion }}<br />
+            <small>ID: {{ r.referencia_Id }}</small>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 
-  <!-- 🔁 Paginación -->
-  <div class="pagination" style="text-align: center; margin-top: 20px;">
-  <button (click)="cambiarPagina(paginaActual - 1)" [disabled]="paginaActual === 1">⬅ Anterior</button>
+  <!-- 📌 Tablero Kanban (solo si vista es 'todas') -->
+  <div class="kanban-wrapper" *ngIf="vistaActiva === 'todas'">
+    <div class="kanban-board">
+      <div class="column" *ngFor="let estado of obtenerEstadosUnicos()">
+        <div class="column-title">{{ estado }}</div>
 
-  <button *ngFor="let p of paginasVisibles"
-          [disabled]="p === paginaActual"
-          (click)="p > 0 && cambiarPagina(p)">
-    {{ p > 0 ? p : '...' }}
-  </button>
+        <div class="task" *ngFor="let tarea of getTareasPorEstado(estado)">
+          <div class="task-prioridad" [ngStyle]="{ 'background-color': getColorPrioridad(tarea.nivel_Prioridad) }"></div>
+          <div class="task-content">
+            <strong>ID:</strong> {{ tarea.iD_Tarea }}<br />
+            <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
+            <strong>Tipo:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br />
+            <strong>Prioridad:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
+            <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})<br />
+            <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <button (click)="cambiarPagina(paginaActual + 1)" [disabled]="paginaActual === paginasTotales">Siguiente ➡</button>
+    <!-- 🔁 Paginación -->
+    <div class="paginacion">
+      <button (click)="anterior()" [disabled]="paginaActual === 1">«</button>
+
+      <ng-container *ngFor="let num of paginasVisibles">
+        <ng-container *ngIf="num !== -1">
+          <button
+            [class.activa]="num === paginaActual"
+            (click)="irAPagina(num)"
+          >
+            {{ num }}
+          </button>
+        </ng-container>
+        <ng-container *ngIf="num === -1">
+          <span class="separador">...</span>
+        </ng-container>
+      </ng-container>
+
+      <button (click)="siguiente()" [disabled]="paginaActual === paginasTotales">»</button>
+    </div>
+  </div>
+
+  <!-- 📝 Vista de tareas creadas (solo si vista es 'creadas') -->
+  <div *ngIf="vistaActiva === 'creadas'" style="padding: 1rem;">
+    <p>Aquí se mostrarán las tareas creadas por el usuario.</p>
+  </div>
 </div>
