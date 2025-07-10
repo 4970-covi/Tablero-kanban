@@ -1,23 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
-
+import { forkJoin } from 'rxjs';
+import { TareaInterface } from '../../interfaces/tarea.interface';
 import { EstadoInterface } from '../../interfaces/estado.interface';
 import { PrioridadInterface } from '../../interfaces/prioridad.interface';
 import { TipoTareaInterface } from '../../interfaces/tipo-tarea.interface';
+import { ReferenciaInterface } from '../../interfaces/referencia.interface';
 
 import { TareaService } from '../../services/tarea.service';
 import { EstadoService } from '../../services/estado.service';
 import { PrioridadService } from '../../services/prioridad.service';
 import { TipoTareaService } from '../../services/tipo-tarea.service';
-import { forkJoin, Observable } from 'rxjs';
-import { ReferenciaInterface } from '../../interfaces/referencia.interface';
+import { TareasCreadasService } from '../../services/tareas-creadas.service';
+import { TareasAsignadasService } from '../../services/tarea-asignadas.service';
+import { TareasInvitacionesService } from '../../services/tareas-invitaciones.service';  // IMPORTANTE
 import { ReferenciaService } from '../../services/referencia.service';
-import { TareaInterface } from '../../interfaces/tarea.interface';
-
-// ...imports (igual)
 
 @Component({
   selector: 'app-kanban',
@@ -27,39 +27,32 @@ import { TareaInterface } from '../../interfaces/tarea.interface';
   styleUrls: ['./kanban.component.scss']
 })
 export class KanbanComponent implements OnInit {
-  tareas: TareaInterface[] = [];
-  tareasFiltradas: TareaInterface[] = [];
+  vistaActiva: 'todas' | 'creadas' | 'asignadas' | 'invitaciones' = 'todas';
+
   tareasTodas: TareaInterface[] = [];
   tareasCreadas: TareaInterface[] = [];
-
+  tareasAsignadas: TareaInterface[] = [];
+  tareasInvitadas: TareaInterface[] = [];
+  tareasFiltradas: TareaInterface[] = [];
 
   estadosDisponibles: EstadoInterface[] = [];
   prioridadesDisponibles: PrioridadInterface[] = [];
   tiposTareaDisponibles: TipoTareaInterface[] = [];
-  
+
+  filtroReferencia = '';
+  referenciaExactaSeleccionada: number | null = null;
   resultadosReferencia: ReferenciaInterface[] = [];
-  vistaActiva: string = 'todas';
+  mostrarResultadosFlotantes = false;
 
-
-
-
-
+  estadoSeleccionado = '';
+  prioridadSeleccionada: number | null = null;
+  tipoSeleccionado: number | null = null;
 
   totalRegistros = 0;
   tareasPorPagina = 30;
   paginaActual = 1;
   paginasTotales = 0;
   paginasVisibles: number[] = [];
-
-
-  
-  mostrarResultadosFlotantes = false;
-
-  filtroReferencia = '';
-  estadoSeleccionado = '';
-  prioridadSeleccionada: number | null = null;
-  tipoSeleccionado: number | null = null;
-  
 
   token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhZG1pbiIsIm5iZiI6MTc1MDM0NjcyNCwiZXhwIjoxNzgxNDUwNzI0LCJpYXQiOjE3NTAzNDY3MjR9.NChZbZBfi3IZIVidfWujhmcwgtFYF4hDM1Xg7Z7z5J0';
   usuario = 'desa026';
@@ -69,75 +62,184 @@ export class KanbanComponent implements OnInit {
     private estadoService: EstadoService,
     private prioridadService: PrioridadService,
     private tipoTareaService: TipoTareaService,
+    private tareasCreadasService: TareasCreadasService,
+    private tareasAsignadasService: TareasAsignadasService,
+    private tareasInvitacionesService: TareasInvitacionesService,  // <-- Servicio invitadas
     private referenciaService: ReferenciaService
   ) {}
 
   ngOnInit(): void {
-    this.cargarFiltros().subscribe(res => {
+    this.cargarFiltros();
+    this.obtenerTareas();
+  }
+
+  cargarFiltros(): void {
+    forkJoin({
+      estados: this.estadoService.getEstados(this.token),
+      prioridades: this.prioridadService.getPrioridades(this.token),
+      tiposTarea: this.tipoTareaService.getTiposTarea(this.token)
+    }).subscribe(res => {
       this.estadosDisponibles = res.estados.data;
       this.prioridadesDisponibles = res.prioridades.data;
       this.tiposTareaDisponibles = res.tiposTarea.data;
     });
+  }
+
+  cambiarVista(vista: 'todas' | 'creadas' | 'asignadas' | 'invitaciones'): void {
+    this.vistaActiva = vista;
+    this.paginaActual = 1;
     this.obtenerTareas();
   }
-  cambiarVista(vista: string): void {
-    this.vistaActiva = vista;
+
+  get tareas(): TareaInterface[] {
+    switch (this.vistaActiva) {
+      case 'todas': return this.tareasTodas;
+      case 'creadas': return this.tareasCreadas;
+      case 'asignadas': return this.tareasAsignadas;
+      case 'invitaciones': return this.tareasInvitadas;
+      default: return [];
+    }
   }
 
-
-
   obtenerTareas(): void {
-    const rangoIni = (this.paginaActual - 1) * this.tareasPorPagina;
-    const rangoFin = this.paginaActual * this.tareasPorPagina;
+    const ini = (this.paginaActual - 1) * this.tareasPorPagina;
+    const fin = this.paginaActual * this.tareasPorPagina;
 
-    this.tareaService.getTodas(this.token, rangoIni, rangoFin).subscribe({
-      next: res => {
-        this.tareas = res.data;
-        this.totalRegistros = this.tareas[0]?.registros || 0;
-        this.paginasTotales = Math.ceil(this.totalRegistros / this.tareasPorPagina);
-        this.generarPaginacion();
-        this.aplicarFiltro();
-      },
-      error: err => console.error('Error al obtener tareas:', err)
+    const servicio =
+  this.vistaActiva === 'todas'
+    ? this.tareaService.getTodas(this.token, ini, fin)
+    : this.vistaActiva === 'creadas'
+    ? this.tareasCreadasService.getCreadas(this.token, ini, fin)
+    : this.vistaActiva === 'asignadas'
+    ? this.tareasAsignadasService.getAsignadas(this.token, ini, fin)
+    : this.vistaActiva === 'invitaciones'
+    ? this.tareasInvitacionesService.getInvitaciones(this.token, ini, fin)
+    : null;  // En caso de que no coincida ninguna vista
+
+
+    if (!servicio) {
+  console.error('No se encontró servicio para vista:', this.vistaActiva);
+  return;
+}
+
+  servicio.subscribe((res: { data: TareaInterface[]; }) => {
+    if (this.vistaActiva === 'todas') this.tareasTodas = res.data;
+    if (this.vistaActiva === 'creadas') this.tareasCreadas = res.data;
+    if (this.vistaActiva === 'asignadas') this.tareasAsignadas = res.data;
+    if (this.vistaActiva === 'invitaciones') this.tareasInvitadas = res.data;
+
+    this.actualizarPaginacion(res.data);
+  });
+  }
+
+  actualizarPaginacion(arr: TareaInterface[]): void {
+    this.totalRegistros = arr[0]?.registros || 0;
+    this.paginasTotales = Math.ceil(this.totalRegistros / this.tareasPorPagina);
+    this.generarPaginacion();
+    this.aplicarFiltro();
+  }
+
+  aplicarFiltro(): void {
+    this.tareasFiltradas = this.tareas.filter(t => {
+      const coincideEstado = this.estadoSeleccionado ? t.tarea_Estado === this.estadoSeleccionado : true;
+      const coincidePrioridad = this.prioridadSeleccionada != null ? t.nivel_Prioridad === this.prioridadSeleccionada : true;
+      const coincideTipo = this.tipoSeleccionado != null ? t.tipo_Tarea === this.tipoSeleccionado : true;
+
+      const coincideReferencia = this.referenciaExactaSeleccionada
+        ? t.referencia === this.referenciaExactaSeleccionada
+        : this.filtroReferencia.trim()
+          ? (t.descripcion_Referencia?.toLowerCase().includes(this.filtroReferencia.toLowerCase().trim()) ||
+            t.referencia?.toString().includes(this.filtroReferencia.trim()))
+          : true;
+
+      return coincideEstado && coincidePrioridad && coincideTipo && coincideReferencia;
     });
+  }
+
+  buscarPorReferencia(): void {
+    const texto = this.filtroReferencia.trim();
+    if (!texto) {
+      this.resultadosReferencia = [];
+      this.referenciaExactaSeleccionada = null;
+      this.mostrarResultadosFlotantes = false;
+      this.aplicarFiltro();
+      return;
+    }
+
+    this.referenciaService.buscarPorTexto(this.token, texto, this.usuario, '1').subscribe({
+      next: res => {
+        this.resultadosReferencia = res.data;
+
+        if (res.data.length === 1) {
+          this.referenciaExactaSeleccionada = res.data[0].referencia;
+          this.mostrarResultadosFlotantes = false;
+          this.aplicarFiltro();
+        } else if (res.data.length > 1) {
+          this.mostrarResultadosFlotantes = true;
+        } else {
+          this.referenciaExactaSeleccionada = null;
+          this.mostrarResultadosFlotantes = false;
+          this.aplicarFiltro();
+        }
+      },
+      error: err => {
+        console.error('Error al buscar referencias:', err);
+        this.referenciaExactaSeleccionada = null;
+        this.mostrarResultadosFlotantes = false;
+        this.resultadosReferencia = [];
+        this.aplicarFiltro();
+      }
+    });
+  }
+
+  filtrarPorReferenciaSeleccionada(r: ReferenciaInterface): void {
+    this.filtroReferencia = `${r.referencia} ${r.descripcion}`;
+    this.referenciaExactaSeleccionada = r.referencia;
+    this.mostrarResultadosFlotantes = false;
+    this.aplicarFiltro();
+  }
+
+  confirmarReferenciaConEnter(): void {
+    if (this.resultadosReferencia.length === 1) {
+      this.filtrarPorReferenciaSeleccionada(this.resultadosReferencia[0]);
+    } else {
+      this.aplicarFiltro();
+    }
+  }
+
+  limpiarFiltros(): void {
+    this.estadoSeleccionado = '';
+    this.tipoSeleccionado = null;
+    this.prioridadSeleccionada = null;
+    this.filtroReferencia = '';
+    this.referenciaExactaSeleccionada = null;
+    this.resultadosReferencia = [];
+    this.aplicarFiltro();
+  }
+
+  seleccionarEstado(_: any): void {
+    this.aplicarFiltro();
+  }
+
+  seleccionarTipo(_: any): void {
+    this.aplicarFiltro();
   }
 
   generarPaginacion(): void {
     const total = this.paginasTotales;
     const actual = this.paginaActual;
-    const visibles: number[] = [];
+    let visibles: number[] = [];
 
-    // Siempre mostrar las primeras 3 si estás lejos
-    if (actual > 4) {
-      visibles.push(1, 2, 3);
-      visibles.push(-1); // '...' marcador
-    } else {
-      for (let i = 1; i <= Math.min(3, total); i++) {
-        visibles.push(i);
-      }
-    }
+    visibles.push(1, 2, 3);
+    if (actual > 4 && actual < total - 2) visibles.push(actual - 1, actual, actual + 1);
+    for (let i = total - 2; i <= total; i++) if (i > 3) visibles.push(i);
 
-    // Mostrar páginas alrededor del actual
-    for (let i = actual - 1; i <= actual + 1; i++) {
-      if (i > 3 && i <= total) {
-        visibles.push(i);
-      }
-    }
-
-    // Agrega botón siguiente si hay más páginas
-    if (actual + 1 < total) {
-      visibles.push(actual + 2); // una más por delante
-    }
-
-    // Eliminar duplicados y ordenar
-    this.paginasVisibles = [...new Set(visibles)].filter(n => n > 0 && n <= total).sort((a, b) => a - b);
+    this.paginasVisibles = [...new Set(visibles.filter(v => v >= 1 && v <= total))];
   }
 
-
-
-  irAPagina(num: number): void {
-    if (num !== this.paginaActual) {
-      this.paginaActual = num;
+  irAPagina(n: number): void {
+    if (n !== this.paginaActual) {
+      this.paginaActual = n;
       this.obtenerTareas();
     }
   }
@@ -156,109 +258,8 @@ export class KanbanComponent implements OnInit {
     }
   }
 
-  cambiarPagina(num: number): void {
-    this.irAPagina(num);
-  }
-
-  cargarFiltros(): Observable<any> {
-    return forkJoin({
-      estados: this.estadoService.getEstados(this.token),
-      prioridades: this.prioridadService.getPrioridades(this.token),
-      tiposTarea: this.tipoTareaService.getTiposTarea(this.token)
-    });
-  }
-
-  aplicarFiltro(): void {
-    this.tareasFiltradas = this.tareas.filter(t => {
-      const coincideEstado = this.estadoSeleccionado ? t.tarea_Estado === this.estadoSeleccionado : true;
-      const coincidePrioridad = this.prioridadSeleccionada != null ? t.nivel_Prioridad === this.prioridadSeleccionada : true;
-      const coincideTipo = this.tipoSeleccionado != null ? t.tipo_Tarea === this.tipoSeleccionado : true;
-      const coincideReferencia = this.filtroReferencia.trim()
-        ? t.descripcion_Referencia.toLowerCase().includes(this.filtroReferencia.toLowerCase())
-        : true;
-      return coincideEstado && coincidePrioridad && coincideTipo && coincideReferencia;
-    });
-  }
-  buscarPorReferencia(): void {
-    const texto = this.filtroReferencia.trim();
-
-    if (!texto) {
-      this.mostrarResultadosFlotantes = false;
-      this.resultadosReferencia = [];
-      this.aplicarFiltro(); // Vuelve a mostrar todas las tareas
-      return;
-    }
-
-    this.referenciaService.buscarPorTexto(this.token, texto, this.usuario, '1').subscribe({
-      next: res => {
-        const resultados = res.data;
-        this.resultadosReferencia = resultados;
-
-        if (resultados.length === 1) {
-          // Filtra temporalmente si hay una coincidencia
-          this.tareasFiltradas = this.tareas.filter(
-            t => t.referencia === resultados[0].referencia
-          );
-          this.mostrarResultadosFlotantes = false;
-        } else if (resultados.length > 1) {
-          this.mostrarResultadosFlotantes = true;
-        } else {
-          // No hay coincidencias: limpiar filtro
-          this.resultadosReferencia = [];
-          this.mostrarResultadosFlotantes = false;
-          this.aplicarFiltro(); // <- vuelve al estado general
-        }
-      },
-      error: err => {
-        console.error('Error al buscar referencias:', err);
-        this.resultadosReferencia = [];
-        this.mostrarResultadosFlotantes = false;
-        this.aplicarFiltro(); // También limpia si hubo un error
-      }
-    });
-  }
-
-
-
-
-
-  filtrarPorReferenciaSeleccionada(r: ReferenciaInterface): void {
-    this.filtroReferencia = `${r.referencia} ${r.descripcion}`;
-    this.mostrarResultadosFlotantes = false;
-
-    // Aplicar filtro en el tablero Kanban con el campo 'referencia' (número)
-    this.tareasFiltradas = this.tareas.filter(t => t.referencia === r.referencia);
-  }
-
-
-
-
-
-  seleccionarEstado(estado: string): void {
-    this.estadoSeleccionado = estado;
-    this.aplicarFiltro();
-  }
-
-  seleccionarPrioridad(nivel: number | null): void {
-    this.prioridadSeleccionada = nivel;
-    this.aplicarFiltro();
-  }
-
-  seleccionarTipo(tipo: number | null): void {
-    this.tipoSeleccionado = tipo;
-    this.aplicarFiltro();
-  }
-
-  limpiarFiltros(): void {
-    this.estadoSeleccionado = '';
-    this.prioridadSeleccionada = null;
-    this.tipoSeleccionado = null;
-    this.filtroReferencia = '';
-    this.aplicarFiltro();
-  }
-
   getColorPrioridad(nivel: number): string {
-    const p = this.prioridadesDisponibles.find(p => p.nivel_Prioridad === nivel);
+    const p = this.prioridadesDisponibles.find(x => x.nivel_Prioridad === nivel);
     return p?.backColor || '#fff';
   }
 
@@ -269,11 +270,4 @@ export class KanbanComponent implements OnInit {
   getTareasPorEstado(estado: string): TareaInterface[] {
     return this.tareasFiltradas.filter(t => t.tarea_Estado === estado);
   }
-  confirmarReferenciaConEnter(): void {
-    if (this.resultadosReferencia.length === 1) {
-      // Solo una coincidencia, fijar el filtro
-      this.filtrarPorReferenciaSeleccionada(this.resultadosReferencia[0]);
-    }
-  }
 }
-

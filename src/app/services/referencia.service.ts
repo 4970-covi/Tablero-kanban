@@ -6,6 +6,9 @@ import { ResponseInterface } from '../interfaces/response.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ReferenciaService {
+  buscar(texto: string, token: string) {
+    throw new Error('Method not implemented.');
+  }
   private baseUrl = 'http://localhost:9085/api/';
 
   constructor(private http: HttpClient) {}

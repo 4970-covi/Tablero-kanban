@@ -1,27 +1,11 @@
+<!-- kanban.component.html -->
 <div class="kanban-container">
-
   <h2 style="text-align: center;">Tablero Kanban</h2>
 
-  <!-- 🔖 Navegación de pestañas -->
-  <div class="tab-container">
-    <button
-      [class.active-tab]="vistaActiva === 'todas'"
-      (click)="cambiarVista('todas')"
-    >
-      Todas las tareas
-    </button>
-    <button
-      [class.active-tab]="vistaActiva === 'creadas'"
-      (click)="cambiarVista('creadas')"
-    >
-      Tareas creadas
-    </button>
-  </div>
-
-  <!-- 🔍 Filtros (solo si está en 'todas') -->
-  <div *ngIf="vistaActiva === 'todas'" class="filtros" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+  <!--  Filtros -->
+  <div class="filtros" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
     <!-- Estado -->
-    <select [(ngModel)]="estadoSeleccionado" (change)="seleccionarEstado(estadoSeleccionado)">
+    <select [(ngModel)]="estadoSeleccionado" (change)="seleccionarEstado($event)">
       <option value="">Todos los estados</option>
       <option *ngFor="let estado of estadosDisponibles" [value]="estado.descripcion">
         {{ estado.descripcion }}
@@ -29,7 +13,7 @@
     </select>
 
     <!-- Tipo -->
-    <select [(ngModel)]="tipoSeleccionado" (change)="seleccionarTipo(tipoSeleccionado)">
+    <select [(ngModel)]="tipoSeleccionado" (change)="seleccionarTipo($event)">
       <option [ngValue]="null">Todos los tipos</option>
       <option *ngFor="let tipo of tiposTareaDisponibles" [ngValue]="tipo.tipo_Tarea">
         {{ tipo.descripcion }}
@@ -37,7 +21,7 @@
     </select>
 
     <!-- Prioridad -->
-    <select id="prioridad" [(ngModel)]="prioridadSeleccionada" (change)="aplicarFiltro()">
+    <select [(ngModel)]="prioridadSeleccionada" (change)="aplicarFiltro()">
       <option [ngValue]="null">Filtrar por prioridad</option>
       <option *ngFor="let prioridad of prioridadesDisponibles" [ngValue]="prioridad.nivel_Prioridad">
         {{ prioridad.nombre }}
@@ -55,7 +39,6 @@
       />
       <button (click)="limpiarFiltros()">Limpiar Filtros</button>
 
-      <!-- Ventana emergente de resultados -->
       <div *ngIf="mostrarResultadosFlotantes" class="ventana-resultados">
         <div class="cabecera-ventana">
           <h4>Resultados de referencia</h4>
@@ -75,12 +58,20 @@
     </div>
   </div>
 
-  <!-- 📌 Tablero Kanban (solo si vista es 'todas') -->
-  <div class="kanban-wrapper" *ngIf="vistaActiva === 'todas'">
+  <!-- Tabs -->
+  <div class="tab-container">
+    <button [class.active-tab]="vistaActiva === 'todas'" (click)="cambiarVista('todas')">Todas las tareas</button>
+    <button [class.active-tab]="vistaActiva === 'creadas'" (click)="cambiarVista('creadas')">Tareas creadas</button>
+    <button [class.active-tab]="vistaActiva === 'asignadas'" (click)="cambiarVista('asignadas')">Tareas asignadas</button>
+    <button [class.active-tab]="vistaActiva === 'invitaciones'" (click)="cambiarVista('invitaciones')">Tareas invitaciones</button>
+  </div>
+
+
+  <!-- Tablero Kanban -->
+  <div class="kanban-wrapper">
     <div class="kanban-board">
       <div class="column" *ngFor="let estado of obtenerEstadosUnicos()">
         <div class="column-title">{{ estado }}</div>
-
         <div class="task" *ngFor="let tarea of getTareasPorEstado(estado)">
           <div class="task-prioridad" [ngStyle]="{ 'background-color': getColorPrioridad(tarea.nivel_Prioridad) }"></div>
           <div class="task-content">
@@ -95,7 +86,7 @@
       </div>
     </div>
 
-    <!-- 🔁 Paginación -->
+    <!-- Paginación -->
     <div class="paginacion">
       <button (click)="anterior()" [disabled]="paginaActual === 1">«</button>
 
@@ -116,9 +107,3 @@
       <button (click)="siguiente()" [disabled]="paginaActual === paginasTotales">»</button>
     </div>
   </div>
-
-  <!-- 📝 Vista de tareas creadas (solo si vista es 'creadas') -->
-  <div *ngIf="vistaActiva === 'creadas'" style="padding: 1rem;">
-    <p>Aquí se mostrarán las tareas creadas por el usuario.</p>
-  </div>
-</div>
