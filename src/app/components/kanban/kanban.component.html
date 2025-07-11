@@ -80,7 +80,8 @@
             <strong>Tipo:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br />
             <strong>Prioridad:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
             <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})<br />
-            <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}
+            <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}<br />
+            <strong>Invitados:</strong> {{ tareaInvitados[tarea.referencia] || 'Sin invitado' }}
           </div>
         </div>
       </div>

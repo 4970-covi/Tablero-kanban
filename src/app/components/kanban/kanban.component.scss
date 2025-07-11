@@ -237,3 +237,26 @@ h2 {
   }
 }
 
+.tarjeta-tarea {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #fff;
+
+  .invitado-principal {
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .mas-invitados {
+    color: #888;
+    font-size: 0.9em;
+    margin-left: 6px;
+  }
+
+  .sin-invitado {
+    color: #aaa;
+    font-style: italic;
+  }
+}

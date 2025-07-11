@@ -18,6 +18,7 @@ import { TareasCreadasService } from '../../services/tareas-creadas.service';
 import { TareasAsignadasService } from '../../services/tarea-asignadas.service';
 import { TareasInvitacionesService } from '../../services/tareas-invitaciones.service';  
 import { ReferenciaService } from '../../services/referencia.service';
+import { TareaInvitadosService } from '../../services/tarea-invitados.service';
 
 @Component({
   selector: 'app-kanban',
@@ -28,6 +29,8 @@ import { ReferenciaService } from '../../services/referencia.service';
 })
 export class KanbanComponent implements OnInit {
   vistaActiva: 'todas' | 'creadas' | 'asignadas' | 'invitaciones' = 'todas';
+  tareaInvitados: { [tareaId: number]: string } = {};
+
 
   tareasTodas: TareaInterface[] = [];
   tareasCreadas: TareaInterface[] = [];
@@ -65,7 +68,9 @@ export class KanbanComponent implements OnInit {
     private tareasCreadasService: TareasCreadasService,
     private tareasAsignadasService: TareasAsignadasService,
     private tareasInvitacionesService: TareasInvitacionesService, 
-    private referenciaService: ReferenciaService
+    private referenciaService: ReferenciaService,
+    private tareaInvitadosService: TareaInvitadosService
+    
   ) {}
 
   ngOnInit(): void {
@@ -129,6 +134,19 @@ export class KanbanComponent implements OnInit {
     if (this.vistaActiva === 'invitaciones') this.tareasInvitadas = res.data;
 
     this.actualizarPaginacion(res.data);
+      res.data.forEach(tarea => {
+    this.tareaInvitadosService.getInvitadoPorTarea(this.token, tarea.referencia!, this.usuario).subscribe({
+      next: resp => {
+        if (resp.data.length > 0) {
+          this.tareaInvitados[tarea.referencia!] = resp.data[0].userName;
+        }
+      },
+      error: err => {
+        console.warn(`Error cargando invitado para tarea ${tarea.referencia}:`, err);
+      }
+    });
+  });
+
   });
   }
 
