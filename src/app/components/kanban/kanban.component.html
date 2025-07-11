@@ -94,8 +94,7 @@
         <ng-container *ngIf="num !== -1">
           <button
             [class.activa]="num === paginaActual"
-            (click)="irAPagina(num)"
-          >
+            (click)="irAPagina(num)">
             {{ num }}
           </button>
         </ng-container>
@@ -106,4 +105,4 @@
 
       <button (click)="siguiente()" [disabled]="paginaActual === paginasTotales">»</button>
     </div>
-  </div>
+

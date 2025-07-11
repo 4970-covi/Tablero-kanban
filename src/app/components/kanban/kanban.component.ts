@@ -10,13 +10,13 @@ import { PrioridadInterface } from '../../interfaces/prioridad.interface';
 import { TipoTareaInterface } from '../../interfaces/tipo-tarea.interface';
 import { ReferenciaInterface } from '../../interfaces/referencia.interface';
 
-import { TareaService } from '../../services/tarea.service';
+import { TareaService } from '../../services/tarea-todas.service';
 import { EstadoService } from '../../services/estado.service';
 import { PrioridadService } from '../../services/prioridad.service';
 import { TipoTareaService } from '../../services/tipo-tarea.service';
 import { TareasCreadasService } from '../../services/tareas-creadas.service';
 import { TareasAsignadasService } from '../../services/tarea-asignadas.service';
-import { TareasInvitacionesService } from '../../services/tareas-invitaciones.service';  // IMPORTANTE
+import { TareasInvitacionesService } from '../../services/tareas-invitaciones.service';  
 import { ReferenciaService } from '../../services/referencia.service';
 
 @Component({
@@ -64,7 +64,7 @@ export class KanbanComponent implements OnInit {
     private tipoTareaService: TipoTareaService,
     private tareasCreadasService: TareasCreadasService,
     private tareasAsignadasService: TareasAsignadasService,
-    private tareasInvitacionesService: TareasInvitacionesService,  // <-- Servicio invitadas
+    private tareasInvitacionesService: TareasInvitacionesService, 
     private referenciaService: ReferenciaService
   ) {}
 
@@ -228,14 +228,29 @@ export class KanbanComponent implements OnInit {
   generarPaginacion(): void {
     const total = this.paginasTotales;
     const actual = this.paginaActual;
-    let visibles: number[] = [];
+    const visibles: (number | -1)[] = [];
 
-    visibles.push(1, 2, 3);
-    if (actual > 4 && actual < total - 2) visibles.push(actual - 1, actual, actual + 1);
-    for (let i = total - 2; i <= total; i++) if (i > 3) visibles.push(i);
+    // Siempre incluir las primeras 3 si existen
+    if (total >= 1) visibles.push(1);
+    if (total >= 2) visibles.push(2);
+    if (total >= 3) visibles.push(3);
 
-    this.paginasVisibles = [...new Set(visibles.filter(v => v >= 1 && v <= total))];
+    // Si la página actual está después de la 5, agregar "..." después del 3
+    if (actual > 5) {
+      visibles.push(-1); // puntos suspensivos
+    }
+
+    // Agregar páginas desde actual - 2 hasta actual + 1 (siempre mayores a 3)
+    for (let i = actual - 2; i <= actual + 1; i++) {
+      if (i > 3 && i <= total) {
+        visibles.push(i);
+      }
+    }
+
+    this.paginasVisibles = visibles;
   }
+
+
 
   irAPagina(n: number): void {
     if (n !== this.paginaActual) {
@@ -257,6 +272,10 @@ export class KanbanComponent implements OnInit {
       this.obtenerTareas();
     }
   }
+
+
+
+
 
   getColorPrioridad(nivel: number): string {
     const p = this.prioridadesDisponibles.find(x => x.nivel_Prioridad === nivel);
