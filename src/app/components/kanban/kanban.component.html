@@ -52,9 +52,38 @@
           >
             <strong>{{ r.referencia }}</strong> – {{ r.descripcion }}<br />
             <small>ID: {{ r.referencia_Id }}</small>
+
           </li>
         </ul>
       </div>
+      <!-- Usuario -->
+<div class="contenedor-input-usuario">
+  <input
+    type="text"
+    [(ngModel)]="filtroUsuario"
+    (input)="buscarPorUsuario()"
+    (keydown.enter)="confirmarUsuarioConEnter()"
+    placeholder="Buscar usuario..."
+  />
+
+  <div *ngIf="mostrarUsuariosFlotantes" class="ventana-resultados">
+    <div class="cabecera-ventana">
+      <h4>Resultados de usuarios</h4>
+      <button (click)="mostrarUsuariosFlotantes = false" class="cerrar-ventana">✖</button>
+    </div>
+    <ul class="lista-referencias">
+      <li
+        *ngFor="let u of usuariosCoincidentes"
+        (click)="filtrarPorUsuarioSeleccionado(u)"
+        class="opcion-referencia"
+      >
+        <strong>{{ u.userName }}</strong> – {{ u.name }}<br />
+        <small>{{ u.email }}</small>
+      </li>
+    </ul>
+  </div>
+</div>
+
     </div>
   </div>
 
@@ -81,11 +110,23 @@
             <strong>Prioridad:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
             <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})<br />
             <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}<br />
-            <strong>Invitados:</strong> {{ tareaInvitados[tarea.referencia] || 'Sin invitado' }}
-          </div>
-        </div>
-      </div>
-    </div>
+            <strong>Invitados:</strong>
+            <span *ngIf="(tareaInvitados[tarea.iD_Tarea]?.length ?? 0) > 0">
+
+              {{ getPrimerInvitado(tarea.iD_Tarea) }}
+              <span *ngIf="getCantidadRestante(tarea.iD_Tarea) > 0"
+                    [title]="getRestoInvitadosTooltip(tarea.iD_Tarea)">
+                +{{ getCantidadRestante(tarea.iD_Tarea) }} más
+              </span>
+            </span>
+            <span *ngIf="!tareaInvitados[tarea.iD_Tarea]?.length">
+              Sin invitado
+            </span>
+            </div> 
+          </div> 
+        </div> 
+      </div> 
+    </div> 
 
     <!-- Paginación -->
     <div class="paginacion">

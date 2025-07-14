@@ -19,6 +19,9 @@ import { TareasAsignadasService } from '../../services/tarea-asignadas.service';
 import { TareasInvitacionesService } from '../../services/tareas-invitaciones.service';  
 import { ReferenciaService } from '../../services/referencia.service';
 import { TareaInvitadosService } from '../../services/tarea-invitados.service';
+import { TareaInvitadoInterface } from '../../interfaces/tarea-invitado.interface';
+import { UsuarioInterface } from '../../interfaces/usuario.interface';
+import { UsuarioService } from '../../services/usuario.service';
 
 @Component({
   selector: 'app-kanban',
@@ -29,7 +32,8 @@ import { TareaInvitadosService } from '../../services/tarea-invitados.service';
 })
 export class KanbanComponent implements OnInit {
   vistaActiva: 'todas' | 'creadas' | 'asignadas' | 'invitaciones' = 'todas';
-  tareaInvitados: { [tareaId: number]: string } = {};
+  tareaInvitados: { [tareaId: number]: TareaInvitadoInterface[] } = {};
+
 
 
   tareasTodas: TareaInterface[] = [];
@@ -42,6 +46,12 @@ export class KanbanComponent implements OnInit {
   prioridadesDisponibles: PrioridadInterface[] = [];
   tiposTareaDisponibles: TipoTareaInterface[] = [];
 
+  usuariosCoincidentes: UsuarioInterface[] = [];
+  filtroUsuario = '';
+  usuarioSeleccionado: UsuarioInterface | null = null;
+  mostrarUsuariosFlotantes = false;
+
+
   filtroReferencia = '';
   referenciaExactaSeleccionada: number | null = null;
   resultadosReferencia: ReferenciaInterface[] = [];
@@ -50,6 +60,8 @@ export class KanbanComponent implements OnInit {
   estadoSeleccionado = '';
   prioridadSeleccionada: number | null = null;
   tipoSeleccionado: number | null = null;
+  
+
 
   totalRegistros = 0;
   tareasPorPagina = 30;
@@ -69,7 +81,8 @@ export class KanbanComponent implements OnInit {
     private tareasAsignadasService: TareasAsignadasService,
     private tareasInvitacionesService: TareasInvitacionesService, 
     private referenciaService: ReferenciaService,
-    private tareaInvitadosService: TareaInvitadosService
+    private tareaInvitadosService: TareaInvitadosService,
+    private usuarioService: UsuarioService
     
   ) {}
 
@@ -134,21 +147,74 @@ export class KanbanComponent implements OnInit {
     if (this.vistaActiva === 'invitaciones') this.tareasInvitadas = res.data;
 
     this.actualizarPaginacion(res.data);
-      res.data.forEach(tarea => {
-    this.tareaInvitadosService.getInvitadoPorTarea(this.token, tarea.referencia!, this.usuario).subscribe({
-      next: resp => {
-        if (resp.data.length > 0) {
-          this.tareaInvitados[tarea.referencia!] = resp.data[0].userName;
+
+    res.data.forEach(tarea => {
+      this.tareaInvitadosService.getInvitadoPorTarea(this.token, tarea.iD_Tarea!, this.usuario).subscribe({
+        next: resp => {
+          if (resp.data.length > 0) {
+            this.tareaInvitados[tarea.iD_Tarea!] = resp.data; // <--- guardamos el array completo
+          }
+        },
+        error: err => {
+          console.warn(`Error cargando invitado para tarea ${tarea.iD_Tarea}:`, err);
         }
-      },
-      error: err => {
-        console.warn(`Error cargando invitado para tarea ${tarea.referencia}:`, err);
-      }
+      });
     });
-  });
+
 
   });
   }
+  buscarPorUsuario(): void {
+    const texto = this.filtroUsuario.trim();
+    if (!texto) {
+      this.usuariosCoincidentes = [];
+      this.usuarioSeleccionado = null;
+      this.mostrarUsuariosFlotantes = false;
+      this.aplicarFiltro();
+      return;
+    }
+
+    this.usuarioService.buscarUsuarios(this.token, texto, this.usuario).subscribe({
+      next: res => {
+        this.usuariosCoincidentes = res.data;
+
+        if (res.data.length === 1) {
+          this.usuarioSeleccionado = res.data[0];
+          this.mostrarUsuariosFlotantes = false;
+          this.aplicarFiltro();
+        } else if (res.data.length > 1) {
+          this.mostrarUsuariosFlotantes = true;
+        } else {
+          this.usuarioSeleccionado = null;
+          this.mostrarUsuariosFlotantes = false;
+          this.aplicarFiltro();
+        }
+      },
+      error: err => {
+        console.error('Error al buscar usuarios:', err);
+        this.usuarioSeleccionado = null;
+        this.mostrarUsuariosFlotantes = false;
+        this.usuariosCoincidentes = [];
+        this.aplicarFiltro();
+      }
+    });
+  }
+
+  filtrarPorUsuarioSeleccionado(usuario: UsuarioInterface): void {
+    this.filtroUsuario = usuario.name;
+    this.usuarioSeleccionado = usuario;
+    this.mostrarUsuariosFlotantes = false;
+    this.aplicarFiltro();
+  }
+
+  confirmarUsuarioConEnter(): void {
+    if (this.usuariosCoincidentes.length === 1) {
+      this.filtrarPorUsuarioSeleccionado(this.usuariosCoincidentes[0]);
+    } else {
+      this.aplicarFiltro();
+    }
+  }
+
 
   actualizarPaginacion(arr: TareaInterface[]): void {
     this.totalRegistros = arr[0]?.registros || 0;
@@ -158,21 +224,32 @@ export class KanbanComponent implements OnInit {
   }
 
   aplicarFiltro(): void {
-    this.tareasFiltradas = this.tareas.filter(t => {
-      const coincideEstado = this.estadoSeleccionado ? t.tarea_Estado === this.estadoSeleccionado : true;
-      const coincidePrioridad = this.prioridadSeleccionada != null ? t.nivel_Prioridad === this.prioridadSeleccionada : true;
-      const coincideTipo = this.tipoSeleccionado != null ? t.tipo_Tarea === this.tipoSeleccionado : true;
+  this.tareasFiltradas = this.tareas.filter(t => {
+    const coincideEstado = this.estadoSeleccionado ? t.tarea_Estado === this.estadoSeleccionado : true;
+    const coincidePrioridad = this.prioridadSeleccionada != null ? t.nivel_Prioridad === this.prioridadSeleccionada : true;
+    const coincideTipo = this.tipoSeleccionado != null ? t.tipo_Tarea === this.tipoSeleccionado : true;
 
-      const coincideReferencia = this.referenciaExactaSeleccionada
-        ? t.referencia === this.referenciaExactaSeleccionada
-        : this.filtroReferencia.trim()
-          ? (t.descripcion_Referencia?.toLowerCase().includes(this.filtroReferencia.toLowerCase().trim()) ||
-            t.referencia?.toString().includes(this.filtroReferencia.trim()))
-          : true;
+    const coincideReferencia = this.referenciaExactaSeleccionada
+      ? t.referencia === this.referenciaExactaSeleccionada
+      : this.filtroReferencia.trim()
+        ? (t.descripcion_Referencia?.toLowerCase().includes(this.filtroReferencia.toLowerCase().trim()) ||
+          t.referencia?.toString().includes(this.filtroReferencia.trim()))
+        : true;
 
-      return coincideEstado && coincidePrioridad && coincideTipo && coincideReferencia;
-    });
-  }
+    const coincideUsuario = this.usuarioSeleccionado?.userName
+      ? (
+          t.usuario_Creador === this.usuarioSeleccionado.userName ||
+          t.usuario_Responsable === this.usuarioSeleccionado.userName ||
+          this.tareaInvitados[t.iD_Tarea]?.some(inv => inv.userName === this.usuarioSeleccionado?.userName)
+        )
+      : true;
+
+
+    return coincideEstado && coincidePrioridad && coincideTipo && coincideReferencia && coincideUsuario;
+  });
+}
+
+  
 
   buscarPorReferencia(): void {
     const texto = this.filtroReferencia.trim();
@@ -233,6 +310,10 @@ export class KanbanComponent implements OnInit {
     this.referenciaExactaSeleccionada = null;
     this.resultadosReferencia = [];
     this.aplicarFiltro();
+    this.filtroUsuario = '';
+    this.usuarioSeleccionado = null;
+    this.usuariosCoincidentes = [];
+
   }
 
   seleccionarEstado(_: any): void {
@@ -307,4 +388,19 @@ export class KanbanComponent implements OnInit {
   getTareasPorEstado(estado: string): TareaInterface[] {
     return this.tareasFiltradas.filter(t => t.tarea_Estado === estado);
   }
+
+getPrimerInvitado(tareaId: number): string {
+  const invitados = this.tareaInvitados[tareaId];
+  return invitados?.length > 0 ? invitados[0].userName : 'Sin invitado';
+}
+
+getCantidadRestante(tareaId: number): number {
+  const invitados = this.tareaInvitados[tareaId];
+  return invitados?.length > 1 ? invitados.length - 1 : 0;
+}
+
+getRestoInvitadosTooltip(tareaId: number): string {
+  const invitados = this.tareaInvitados[tareaId];
+  return invitados?.slice(1).map(i => i.userName).join(', ') || '';
+}
 }
