@@ -1,7 +1,15 @@
 <!-- kanban.component.html -->
 <div class="kanban-container">
-  <h2 style="text-align: center;">Tablero Kanban</h2>
+  <!-- Botón modo oscuro -->
+  
 
+  <h2 style="text-align: center;">Tablero Kanban</h2>
+  
+    <div style="text-align: right;">
+        <button (click)="toggleDarkMode()" style="margin-bottom: 10px;">
+          🌙/☀️ Alternar modo oscuro
+        </button>
+    </div>
   <!--  Filtros -->
   <div class="filtros" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
     <!-- Estado -->

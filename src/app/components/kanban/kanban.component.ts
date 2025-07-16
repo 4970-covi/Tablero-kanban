@@ -50,6 +50,7 @@ export class KanbanComponent implements OnInit {
   filtroUsuario = '';
   usuarioSeleccionado: UsuarioInterface | null = null;
   mostrarUsuariosFlotantes = false;
+  modoOscuroActivo = false;
 
 
   filtroReferencia = '';
@@ -89,8 +90,17 @@ export class KanbanComponent implements OnInit {
   ngOnInit(): void {
     this.cargarFiltros();
     this.obtenerTareas();
+    const guardado = localStorage.getItem('modoOscuro');
+      if (guardado === 'true') {
+        document.body.classList.add('dark-mode');
+        this.modoOscuroActivo = true;
+      }
   }
-
+  toggleDarkMode(): void {
+    this.modoOscuroActivo = !this.modoOscuroActivo;
+    document.body.classList.toggle('dark-mode', this.modoOscuroActivo);
+    localStorage.setItem('modoOscuro', this.modoOscuroActivo.toString());
+  }
   cargarFiltros(): void {
     forkJoin({
       estados: this.estadoService.getEstados(this.token),
