@@ -1,0 +1,32 @@
+{
+    "Encabezado": {
+                "TITULO": "Tablero Kanban de DMOSOFT",
+                "SelecEstado": "Todos los estados",
+                "SelecTipo": "Seleccionar Tipo",
+                "SelectPrioridad": "Seleccionar priordad",
+                "BuscReferencia": "Buscar por Referencia...",
+                "BtFiltro": "Limpiar Filtros",
+                "BuscUsuario": "Buscar Usuario...",
+                "BtModoOscuro": "Cambiar Tema",
+                "VentanaEmergente": "Coincidencias"
+                },
+    "Pestanias": {
+
+                "TarTodas": "Todas las Tareas",
+                "TarCreadas": "Tareas Creadas",
+                "TarAsignadas": "Tareas Asignadas",
+                "TarInvitaciones": "Tareas Invitadas"
+                },
+    "Tareas": {
+                "ID": "ID",
+                "Descripcion": "Descripcion",
+                "Tipo": "Tipo",
+                "Prioridad": "Prioridad",
+                "Ref": "Referencia",
+                "Fecha": "Fecha",
+                "Invitados": "Invitados"
+
+
+
+    }
+}

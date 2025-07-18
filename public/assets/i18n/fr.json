@@ -1,0 +1,28 @@
+{
+  "Encabezado": {
+    "TITULO": "Tableau Kanban de DMOSOFT",
+    "SelecEstado": "Tous les états",
+    "SelecTipo": "Sélectionner le type",
+    "SelectPrioridad": "Sélectionner la priorité",
+    "BuscReferencia": "Rechercher par référence...",
+    "BtFiltro": "Réinitialiser les filtres",
+    "BuscUsuario": "Rechercher un utilisateur...",
+    "BtModoOscuro": "Changer le thème",
+    "VentanaEmergente": "Correspondances"
+  },
+  "Pestanias": {
+    "TarTodas": "Toutes les tâches",
+    "TarCreadas": "Tâches créées",
+    "TarAsignadas": "Tâches assignées",
+    "TarInvitaciones": "Tâches invitées"
+  },
+  "Tareas": {
+    "ID": "ID",
+    "Descripcion": "Description",
+    "Tipo": "Type",
+    "Prioridad": "Priorité",
+    "Ref": "Référence",
+    "Fecha": "Date",
+    "Invitados": "Invités"
+  }
+}

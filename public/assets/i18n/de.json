@@ -1,0 +1,28 @@
+{
+  "Encabezado": {
+    "TITULO": "Kanban-Tafel von DMOSOFT",
+    "SelecEstado": "Alle Status",
+    "SelecTipo": "Typ auswählen",
+    "SelectPrioridad": "Priorität auswählen",
+    "BuscReferencia": "Nach Referenz suchen...",
+    "BtFiltro": "Filter zurücksetzen",
+    "BuscUsuario": "Benutzer suchen...",
+    "BtModoOscuro": "Thema wechseln",
+    "VentanaEmergente": "Übereinstimmungen"
+  },
+  "Pestanias": {
+    "TarTodas": "Alle Aufgaben",
+    "TarCreadas": "Erstellte Aufgaben",
+    "TarAsignadas": "Zugewiesene Aufgaben",
+    "TarInvitaciones": "Eingeladene Aufgaben"
+  },
+  "Tareas": {
+    "ID": "ID",
+    "Descripcion": "Beschreibung",
+    "Tipo": "Typ",
+    "Prioridad": "Priorität",
+    "Ref": "Referenz",
+    "Fecha": "Datum",
+    "Invitados": "Eingeladene"
+  }
+}

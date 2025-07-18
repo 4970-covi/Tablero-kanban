@@ -22,15 +22,17 @@ import { TareaInvitadosService } from '../../services/tarea-invitados.service';
 import { TareaInvitadoInterface } from '../../interfaces/tarea-invitado.interface';
 import { UsuarioInterface } from '../../interfaces/usuario.interface';
 import { UsuarioService } from '../../services/usuario.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-kanban',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, TranslateModule],
   templateUrl: './kanban.component.html',
   styleUrls: ['./kanban.component.scss']
 })
 export class KanbanComponent implements OnInit {
+
   vistaActiva: 'todas' | 'creadas' | 'asignadas' | 'invitaciones' = 'todas';
   tareaInvitados: { [tareaId: number]: TareaInvitadoInterface[] } = {};
 
@@ -72,6 +74,8 @@ export class KanbanComponent implements OnInit {
 
   token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJhZG1pbiIsIm5iZiI6MTc1MDM0NjcyNCwiZXhwIjoxNzgxNDUwNzI0LCJpYXQiOjE3NTAzNDY3MjR9.NChZbZBfi3IZIVidfWujhmcwgtFYF4hDM1Xg7Z7z5J0';
   usuario = 'desa026';
+  localStorage: any;
+  
 
   constructor(
     private tareaService: TareaService,
@@ -83,9 +87,13 @@ export class KanbanComponent implements OnInit {
     private tareasInvitacionesService: TareasInvitacionesService, 
     private referenciaService: ReferenciaService,
     private tareaInvitadosService: TareaInvitadosService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private translate: TranslateService
     
-  ) {}
+  ) { 
+
+    this.translate.setDefaultLang('es');
+  }
 
   ngOnInit(): void {
     this.cargarFiltros();
@@ -413,4 +421,9 @@ getRestoInvitadosTooltip(tareaId: number): string {
   const invitados = this.tareaInvitados[tareaId];
   return invitados?.slice(1).map(i => i.userName).join(', ') || '';
 }
+
+cambiarIdioma(idioma: string): void {
+    this.translate.use(idioma);
+  }
 }
+

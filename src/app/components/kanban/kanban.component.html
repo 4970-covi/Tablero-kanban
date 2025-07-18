@@ -1,20 +1,20 @@
 <!-- kanban.component.html -->
 <div class="kanban-container">
   <!-- Botón modo oscuro -->
-  
+  <div style="text-align: right;">
+    <button (click)="cambiarIdioma('es')">Español</button>
+    <button (click)="cambiarIdioma('en')">English</button>
+    <button (click)="cambiarIdioma('fr')">Français</button>
+    <button (click)="cambiarIdioma('de')">German</button>
+    <button (click)="toggleDarkMode()" style="margin-bottom: 10px;">{{'Encabezado.BtModoOscuro' | translate}}</button>
+</div>
 
-  <h2 style="text-align: center;">Tablero Kanban</h2>
-  
-    <div style="text-align: right;">
-        <button (click)="toggleDarkMode()" style="margin-bottom: 10px;">
-          🌙/☀️ Alternar modo oscuro
-        </button>
-    </div>
+  <h1>{{ 'Encabezado.TITULO' | translate }}</h1>
   <!--  Filtros -->
   <div class="filtros" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
     <!-- Estado -->
     <select [(ngModel)]="estadoSeleccionado" (change)="seleccionarEstado($event)">
-      <option value="">Todos los estados</option>
+      <option value="">{{ 'Encabezado.SelecEstado' | translate }}</option>
       <option *ngFor="let estado of estadosDisponibles" [value]="estado.descripcion">
         {{ estado.descripcion }}
       </option>
@@ -22,7 +22,7 @@
 
     <!-- Tipo -->
     <select [(ngModel)]="tipoSeleccionado" (change)="seleccionarTipo($event)">
-      <option [ngValue]="null">Todos los tipos</option>
+      <option [ngValue]="null">{{'Encabezado.SelecTipo' | translate}}</option>
       <option *ngFor="let tipo of tiposTareaDisponibles" [ngValue]="tipo.tipo_Tarea">
         {{ tipo.descripcion }}
       </option>
@@ -30,11 +30,12 @@
 
     <!-- Prioridad -->
     <select [(ngModel)]="prioridadSeleccionada" (change)="aplicarFiltro()">
-      <option [ngValue]="null">Filtrar por prioridad</option>
+      <option [ngValue]="null">{{'Encabezado.SelectPrioridad'| translate}}</option>
       <option *ngFor="let prioridad of prioridadesDisponibles" [ngValue]="prioridad.nivel_Prioridad">
         {{ prioridad.nombre }}
       </option>
     </select>
+    
 
     <!-- Referencia -->
     <div class="contenedor-input-referencia">
@@ -43,13 +44,13 @@
         [(ngModel)]="filtroReferencia"
         (input)="buscarPorReferencia()"
         (keydown.enter)="confirmarReferenciaConEnter()"
-        placeholder="Buscar referencia..."
+        [placeholder]="'Encabezado.BuscReferencia' | translate"
       />
-      <button (click)="limpiarFiltros()">Limpiar Filtros</button>
+      <button (click)="limpiarFiltros()">{{'Encabezado.BtFiltro' | translate}}</button>
 
       <div *ngIf="mostrarResultadosFlotantes" class="ventana-resultados">
         <div class="cabecera-ventana">
-          <h4>Resultados de referencia</h4>
+          <h4>{{'Encabezado.VentanaEmergente' | translate}}</h4>
           <button (click)="mostrarResultadosFlotantes = false" class="cerrar-ventana">✖</button>
         </div>
         <ul class="lista-referencias">
@@ -71,12 +72,12 @@
     [(ngModel)]="filtroUsuario"
     (input)="buscarPorUsuario()"
     (keydown.enter)="confirmarUsuarioConEnter()"
-    placeholder="Buscar usuario..."
+    [placeholder]= "'Encabezado.BuscUsuario'| translate"
   />
 
   <div *ngIf="mostrarUsuariosFlotantes" class="ventana-resultados">
     <div class="cabecera-ventana">
-      <h4>Resultados de usuarios</h4>
+      <h4>{{'Encabezado.VentanaEmergente' | translate}}</h4>
       <button (click)="mostrarUsuariosFlotantes = false" class="cerrar-ventana">✖</button>
     </div>
     <ul class="lista-referencias">
@@ -97,10 +98,10 @@
 
   <!-- Tabs -->
   <div class="tab-container">
-    <button [class.active-tab]="vistaActiva === 'todas'" (click)="cambiarVista('todas')">Todas las tareas</button>
-    <button [class.active-tab]="vistaActiva === 'creadas'" (click)="cambiarVista('creadas')">Tareas creadas</button>
-    <button [class.active-tab]="vistaActiva === 'asignadas'" (click)="cambiarVista('asignadas')">Tareas asignadas</button>
-    <button [class.active-tab]="vistaActiva === 'invitaciones'" (click)="cambiarVista('invitaciones')">Tareas invitaciones</button>
+    <button [class.active-tab]="vistaActiva === 'todas'" (click)="cambiarVista('todas')">{{'Pestanias.TarTodas' | translate}}</button>
+    <button [class.active-tab]="vistaActiva === 'creadas'" (click)="cambiarVista('creadas')">{{'Pestanias.TarCreadas' | translate}}</button>
+    <button [class.active-tab]="vistaActiva === 'asignadas'" (click)="cambiarVista('asignadas')">{{'Pestanias.TarAsignadas' | translate}}</button>
+    <button [class.active-tab]="vistaActiva === 'invitaciones'" (click)="cambiarVista('invitaciones')">{{'Pestanias.TarInvitaciones' | translate}}</button>
   </div>
 
 
@@ -112,13 +113,13 @@
         <div class="task" *ngFor="let tarea of getTareasPorEstado(estado)">
           <div class="task-prioridad" [ngStyle]="{ 'background-color': getColorPrioridad(tarea.nivel_Prioridad) }"></div>
           <div class="task-content">
-            <strong>ID:</strong> {{ tarea.iD_Tarea }}<br />
-            <strong>Descripción:</strong> {{ tarea.descripcion }}<br />
-            <strong>Tipo:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br />
-            <strong>Prioridad:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
-            <strong>Referencia:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})<br />
-            <strong>Fecha:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}<br />
-            <strong>Invitados:</strong>
+            <strong>{{'Tareas.ID' | translate}}:</strong> {{ tarea.iD_Tarea }}<br />
+            <strong>{{'Tareas.Descripcion' | translate}}:</strong> {{ tarea.descripcion }}<br />
+            <strong>{{'Tareas.Tipo' | translate}}:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br />
+            <strong>{{'Tareas.Prioridad' | translate}}:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
+            <strong>{{'Tareas.Ref' | translate}}:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})<br />
+            <strong>{{'Tareas.Fecha' | translate}}:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}<br />
+            <strong>{{'Tareas.Invitados' | translate}}:</strong>
             <span *ngIf="(tareaInvitados[tarea.iD_Tarea]?.length ?? 0) > 0">
 
               {{ getPrimerInvitado(tarea.iD_Tarea) }}

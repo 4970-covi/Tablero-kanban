@@ -1,0 +1,29 @@
+{
+    "Encabezado": {
+                "TITULO": "DMOSOFT Kanban Board",
+                "SelecEstado": "All Status",
+                "SelecTipo": "Select Type",
+                "SelectPrioridad": "Select Priority",
+                "BuscReferencia": "Search by Reference",
+                "BtFiltro": "Clean Filters",
+                "BuscUsuario": "Search User...",
+                "BtModoOscuro": "Change Theme",
+                "VentanaEmergente": "Coincidences"
+                },
+    "Pestanias": {
+
+                "TarTodas": "All Tasks",
+                "TarCreadas": "Created Tasks",
+                "TarAsignadas": "Assigned Tasks",
+                "TarInvitaciones": "Guest Tasks"
+                },
+    "Tareas": {
+                "ID": "ID",
+                "Descripcion": "Description",
+                "Tipo": "Type",
+                "Prioridad": "Priority",
+                "Ref": "Reference",
+                "Fecha": "Date",
+                "Invitados": "Guests"
+                }
+}
