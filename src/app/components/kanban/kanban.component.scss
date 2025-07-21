@@ -106,36 +106,8 @@ h1 {
   }
 }
 
-/* Chips de prioridad */
-.chip {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: bold;
-  cursor: pointer;
-  color: white;
-  transition: all 0.2s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  user-select: none;
 
-  &.prioridad-1 { background-color: #e53935; }
-  &.prioridad-2 { background-color: #fbc02d; color: black; }
-  &.prioridad-3 { background-color: #43a047; }
-  &.prioridad-4 { background-color: #2196f3; }
 
-  &.clear-filter {
-    background-color: #888;
-    color: white;
-  }
-
-  &.selected {
-    outline: 3px solid black;
-  }
-
-  &:hover {
-    transform: scale(1.05);
-  }
-}
 
 /* Input referencia y ventana emergente */
 .contenedor-input-referencia {
