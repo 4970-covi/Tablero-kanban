@@ -53,6 +53,7 @@ export class KanbanComponent implements OnInit {
   usuarioSeleccionado: UsuarioInterface | null = null;
   mostrarUsuariosFlotantes = false;
   modoOscuroActivo = false;
+  mostrarIdiomas = false;
 
 
   filtroReferencia = '';
@@ -327,10 +328,10 @@ export class KanbanComponent implements OnInit {
     this.filtroReferencia = '';
     this.referenciaExactaSeleccionada = null;
     this.resultadosReferencia = [];
-    this.aplicarFiltro();
     this.filtroUsuario = '';
     this.usuarioSeleccionado = null;
     this.usuariosCoincidentes = [];
+    this.aplicarFiltro();
 
   }
 
@@ -422,8 +423,10 @@ getRestoInvitadosTooltip(tareaId: number): string {
   return invitados?.slice(1).map(i => i.userName).join(', ') || '';
 }
 
-cambiarIdioma(idioma: string): void {
-    this.translate.use(idioma);
-  }
-}
 
+
+cambiarIdioma(idioma: string): void {
+  this.translate.use(idioma);
+  this.mostrarIdiomas = false; // Ocultar la lista después de seleccionar
+}
+}

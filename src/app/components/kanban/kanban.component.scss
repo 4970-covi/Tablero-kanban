@@ -1,11 +1,13 @@
+
 .kanban-container {
   padding: 20px;
-  background-color: #fffff0;
+  background-color: #fef5e7;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   min-height: 100vh;
-  font-family: Arial, sans-serif;
+  font-family: 'Playfair Display', serif;
+  
 }
 
 /* Título */
@@ -35,6 +37,7 @@ h1 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   position: relative;
   transition: transform 0.2s ease;
+  
 }
 
 .column:hover {
@@ -45,13 +48,14 @@ h1 {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #00bcd4;
+  background: #134895;
   color: white;
   text-align: center;
   padding: 10px;
   border-radius: 8px 8px 0 0;
   font-weight: 600;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
 }
 
 /* Tareas */
@@ -61,6 +65,7 @@ h1 {
   overflow: hidden;
   margin: 10px 0;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  
 }
 
 .task-prioridad {
@@ -89,7 +94,7 @@ h1 {
     border-radius: 4px;
 
     &.activa {
-      background-color: #007bff;
+      background-color: #134895;
       color: white;
       font-weight: bold;
     }
@@ -162,6 +167,7 @@ h1 {
   border-bottom: 1px solid #ddd;
   margin-bottom: 0.5rem;
   padding-bottom: 0.25rem;
+  font-family: 'Playfair Display', serif;
 
   h4 {
     margin: 0;
@@ -186,6 +192,7 @@ h1 {
   list-style: none;
   margin: 0;
   padding: 0;
+  font-family: 'Playfair Display', serif;
 
   .opcion-referencia {
     padding: 0.75rem;
@@ -198,7 +205,7 @@ h1 {
     }
 
     strong {
-      color: #007bff;
+      color: #134895;
     }
 
     small {
@@ -225,10 +232,12 @@ h1 {
     cursor: pointer;
     font-weight: bold;
     transition: background 0.2s ease;
+    font-family: 'Playfair Display', serif;
 
     &.active-tab {
-      background-color: #007bff;
+      background-color: #134895;
       color: white;
+      
     }
 
     &:hover {
@@ -237,27 +246,99 @@ h1 {
   }
 }
 
-.tarjeta-tarea {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 10px;
-  background: #fff;
 
-  .invitado-principal {
+
+.filtros {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  font-family: 'Playfair Display', serif;
+
+  // Opcional para estilo visual:
+  padding: 10px;
+   // fondo suave
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    select,
+  input[type="text"],
+  button {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    padding: 8px 12px;
+    border: 1px solid #CED4DA; // Gris 4
+    border-radius: 5px;
+    background-color: #FEF5E7; // Fondo beige antiguo
+    color: #000; // Texto negro
+    transition: border-color 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #134895; // Azul
+    }
+  }
+
+  button {
+    background-color: #134895; 
+    color: white;
     font-weight: bold;
-    color: #2c3e50;
+    cursor: pointer;
+    border: none;
+
+    
   }
 
-  .mas-invitados {
-    color: #888;
-    font-size: 0.9em;
-    margin-left: 6px;
-  }
-
-  .sin-invitado {
-    color: #aaa;
-    font-style: italic;
-  }
+}
+.selector-idioma {
+  position: relative;
+  z-index: 1000;
 }
 
+.boton-estandar button {
+  background-color: #134895; /* Azul */
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  font-family: 'Playfair Display', serif;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;      /* justo debajo del botón */
+  left: 0;
+  background-color: #FEF5E7;
+  border: 1px solid #CED4DA;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  z-index: 1001; /* aseguramos que quede encima */
+}
+
+.dropdown-menu button {
+  background-color: #134895; 
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-family: 'Playfair Display', serif;
+  cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+  background-color: #25a704; /* Verde al pasar el cursor */
+}
+.contenedor-botones {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Espacio entre botones */
+}

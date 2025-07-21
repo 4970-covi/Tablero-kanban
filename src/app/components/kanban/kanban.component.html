@@ -1,17 +1,35 @@
 <!-- kanban.component.html -->
 <div class="kanban-container">
-  <!-- Botón modo oscuro -->
-  <div style="text-align: right;">
-    <button (click)="cambiarIdioma('es')">Español</button>
-    <button (click)="cambiarIdioma('en')">English</button>
-    <button (click)="cambiarIdioma('fr')">Français</button>
-    <button (click)="cambiarIdioma('de')">German</button>
-    <button (click)="toggleDarkMode()" style="margin-bottom: 10px;">{{'Encabezado.BtModoOscuro' | translate}}</button>
-</div>
+    <!-- Botón modo oscuro -->
+  
+    <div class="contenedor-botones">
+      <div class="boton-estandar">
+        <button (click)="mostrarIdiomas = !mostrarIdiomas">🌐 Cambiar idioma</button>
+
+        <div *ngIf="mostrarIdiomas" class="dropdown-menu">
+          <button (click)="cambiarIdioma('es')">Español</button>
+          <button (click)="cambiarIdioma('en')">English</button>
+          <button (click)="cambiarIdioma('fr')">Français</button>
+          <button (click)="cambiarIdioma('de')">Deutsch</button>
+        </div>
+      </div>
+      <div class="boton-estandar">
+        <button (click)="toggleDarkMode()">
+          {{ 'Encabezado.BtModoOscuro' | translate }}
+        </button>
+      </div>
+
+      
+    </div>
+
+
+
+
+    
 
   <h1>{{ 'Encabezado.TITULO' | translate }}</h1>
   <!--  Filtros -->
-  <div class="filtros" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+  <div class="filtros">
     <!-- Estado -->
     <select [(ngModel)]="estadoSeleccionado" (change)="seleccionarEstado($event)">
       <option value="">{{ 'Encabezado.SelecEstado' | translate }}</option>
@@ -35,7 +53,6 @@
         {{ prioridad.nombre }}
       </option>
     </select>
-    
 
     <!-- Referencia -->
     <div class="contenedor-input-referencia">
@@ -90,6 +107,7 @@
         <small>{{ u.email }}</small>
       </li>
     </ul>
+    
   </div>
 </div>
 
