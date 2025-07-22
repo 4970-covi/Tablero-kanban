@@ -1,26 +1,32 @@
 <!-- kanban.component.html -->
 <div class="kanban-container">
     <!-- Botón modo oscuro -->
+     
   
-    <div class="contenedor-botones">
-      <div class="boton-estandar">
-        <button (click)="mostrarIdiomas = !mostrarIdiomas">🌐 Cambiar idioma</button>
+    <!-- Botón para abrir/cerrar menú -->
+      <button class="open-menu-btn" (click)="menuAbierto = !menuAbierto">
+        ☰
+      </button>
 
-        <div *ngIf="mostrarIdiomas" class="dropdown-menu">
-          <button (click)="cambiarIdioma('es')">Español</button>
-          <button (click)="cambiarIdioma('en')">English</button>
-          <button (click)="cambiarIdioma('fr')">Français</button>
-          <button (click)="cambiarIdioma('de')">Deutsch</button>
+
+      <!-- Menú lateral izquierdo -->
+      <div class="sidebar" [class.open]="menuAbierto">
+        <h3>{{'Encabezado.MenuU' | translate}}</h3>
+        <button (click)="toggleDarkMode()">🌓 {{ 'Encabezado.BtModoOscuro' | translate }}</button>
+
+        <div style="position: relative;">
+          <button (click)="toggleIdiomas()">🌐 Cambiar idioma</button>
+
+          <div *ngIf="mostrarIdiomas" class="dropdown-menu">
+            <button (click)="cambiarIdioma('es')">Español</button>
+            <button (click)="cambiarIdioma('en')">English</button>
+            <button (click)="cambiarIdioma('fr')">Français</button>
+            <button (click)="cambiarIdioma('de')">Deutsch</button>
+          </div>
         </div>
       </div>
-      <div class="boton-estandar">
-        <button (click)="toggleDarkMode()">
-          {{ 'Encabezado.BtModoOscuro' | translate }}
-        </button>
-      </div>
 
-      
-    </div>
+
 
 
 

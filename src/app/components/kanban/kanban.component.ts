@@ -54,6 +54,7 @@ export class KanbanComponent implements OnInit {
   mostrarUsuariosFlotantes = false;
   modoOscuroActivo = false;
   mostrarIdiomas = false;
+  menuAbierto = false;
 
 
   filtroReferencia = '';
@@ -423,6 +424,9 @@ getRestoInvitadosTooltip(tareaId: number): string {
   return invitados?.slice(1).map(i => i.userName).join(', ') || '';
 }
 
+toggleIdiomas() {
+  this.mostrarIdiomas = !this.mostrarIdiomas;
+}
 
 
 cambiarIdioma(idioma: string): void {

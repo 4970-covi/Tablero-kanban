@@ -51,10 +51,6 @@ body.dark-mode {
     border-color: #555 !important;
   }
 
-  .chip {
-    box-shadow: none !important;
-    opacity: 0.9;
-  }
 
   .chip.clear-filter {
     background-color: #666 !important;
@@ -66,4 +62,9 @@ h4 {
   color: #eee;
 
 }
+.sidebar {
+  background-color: #302f2f;
+
 }
+}
+
