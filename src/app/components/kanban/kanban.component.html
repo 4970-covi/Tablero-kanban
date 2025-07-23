@@ -1,95 +1,83 @@
-<!-- kanban.component.html -->
-<div class="kanban-container">
-    <!-- Botón modo oscuro -->
-     
-  
-    <!-- Botón para abrir/cerrar menú -->
-      <button class="open-menu-btn" (click)="menuAbierto = !menuAbierto">
-        ☰
-      </button>
 
+<div class="kanban-container"><!-- Contenedor -->
+    
+      <button class="open-menu-btn" (click)="menuAbierto = !menuAbierto">☰</button> <!-- Botón para abrir/cerrar menú -->
 
-      <!-- Menú lateral izquierdo -->
-      <div class="sidebar" [class.open]="menuAbierto">
-        <h3>{{'Encabezado.MenuU' | translate}}</h3>
-        <button (click)="toggleDarkMode()">🌓 {{ 'Encabezado.BtModoOscuro' | translate }}</button>
+      <div class="sidebar" [class.open]="menuAbierto"> <!-- Menú lateral izquierdo que se abre o cierra según la variable menuAbierto -->
+        <h3>{{'Encabezado.MenuU' | translate}}</h3> <!-- Título del menú, traducido según el idioma seleccionado -->
+        <button (click)="toggleDarkMode()">🌓 {{ 'Encabezado.BtModoOscuro' | translate }}</button> <!-- Botón para activar o desactivar el modo oscuro -->
 
-        <div style="position: relative;">
-          <button (click)="toggleIdiomas()">🌐 Cambiar idioma</button>
+        <div style="position: relative;"> <!-- Contenedor relativo para el menú desplegable de idiomas -->
+          <button (click)="toggleIdiomas()">🌐 Cambiar idioma</button> <!-- Botón para mostrar u ocultar el selector de idiomas -->
 
-          <div *ngIf="mostrarIdiomas" class="dropdown-menu">
-            <button (click)="cambiarIdioma('es')">Español</button>
-            <button (click)="cambiarIdioma('en')">English</button>
-            <button (click)="cambiarIdioma('fr')">Français</button>
-            <button (click)="cambiarIdioma('de')">Deutsch</button>
+          <div *ngIf="mostrarIdiomas" class="dropdown-menu"> <!-- Menú desplegable que solo se muestra si mostrarIdiomas es true -->
+            <button (click)="cambiarIdioma('es')">Español</button> <!-- Botón para cambiar idioma a español -->
+            <button (click)="cambiarIdioma('en')">English</button> <!-- Botón para cambiar idioma a inglés -->
+            <button (click)="cambiarIdioma('fr')">Français</button> <!-- Botón para cambiar idioma a francés -->
+            <button (click)="cambiarIdioma('de')">Deutsch</button> <!-- Botón para cambiar idioma a alemán -->
           </div>
         </div>
       </div>
 
+    <h1>{{ 'Encabezado.TITULO' | translate }}</h1> <!-- Título principal traducido según idioma -->
 
+    <!-- Filtros para buscar y clasificar tareas -->
+    <div class="filtros">
+      
+      <!-- Filtro por Estado -->
+      <select [(ngModel)]="estadoSeleccionado" (change)="seleccionarEstado($event)"> <!-- Enlace bidireccional con estadoSeleccionado y evento al cambiar -->
+        <option value="">{{ 'Encabezado.SelecEstado' | translate }}</option> <!-- Opción por defecto, sin filtro -->
+        <option *ngFor="let estado of estadosDisponibles" [value]="estado.descripcion"> <!-- Opciones dinámicas por cada estado disponible -->
+          {{ estado.descripcion }} <!-- Mostrar descripción del estado -->
+        </option>
+      </select>
 
+      <!-- Filtro por Tipo de tarea -->
+      <select [(ngModel)]="tipoSeleccionado" (change)="seleccionarTipo($event)"> <!-- Enlace bidireccional con tipoSeleccionado y evento al cambiar -->
+        <option [ngValue]="null">{{'Encabezado.SelecTipo' | translate}}</option> <!-- Opción por defecto sin selección -->
+        <option *ngFor="let tipo of tiposTareaDisponibles" [ngValue]="tipo.tipo_Tarea"> <!-- Opciones dinámicas según tipos de tarea -->
+          {{ tipo.descripcion }} <!-- Mostrar descripción del tipo -->
+        </option>
+      </select>
 
+      <!-- Filtro por Prioridad -->
+      <select [(ngModel)]="prioridadSeleccionada" (change)="aplicarFiltro()"> <!-- Enlace bidireccional con prioridadSeleccionada y aplicar filtro al cambiar -->
+        <option [ngValue]="null">{{'Encabezado.SelectPrioridad'| translate}}</option> <!-- Opción por defecto sin filtro -->
+        <option *ngFor="let prioridad of prioridadesDisponibles" [ngValue]="prioridad.nivel_Prioridad"> <!-- Opciones dinámicas según prioridades disponibles -->
+          {{ prioridad.nombre }} <!-- Mostrar nombre de la prioridad -->
+        </option>
+      </select>
 
-
-    
-
-  <h1>{{ 'Encabezado.TITULO' | translate }}</h1>
-  <!--  Filtros -->
-  <div class="filtros">
-    <!-- Estado -->
-    <select [(ngModel)]="estadoSeleccionado" (change)="seleccionarEstado($event)">
-      <option value="">{{ 'Encabezado.SelecEstado' | translate }}</option>
-      <option *ngFor="let estado of estadosDisponibles" [value]="estado.descripcion">
-        {{ estado.descripcion }}
-      </option>
-    </select>
-
-    <!-- Tipo -->
-    <select [(ngModel)]="tipoSeleccionado" (change)="seleccionarTipo($event)">
-      <option [ngValue]="null">{{'Encabezado.SelecTipo' | translate}}</option>
-      <option *ngFor="let tipo of tiposTareaDisponibles" [ngValue]="tipo.tipo_Tarea">
-        {{ tipo.descripcion }}
-      </option>
-    </select>
-
-    <!-- Prioridad -->
-    <select [(ngModel)]="prioridadSeleccionada" (change)="aplicarFiltro()">
-      <option [ngValue]="null">{{'Encabezado.SelectPrioridad'| translate}}</option>
-      <option *ngFor="let prioridad of prioridadesDisponibles" [ngValue]="prioridad.nivel_Prioridad">
-        {{ prioridad.nombre }}
-      </option>
-    </select>
 
     <!-- Referencia -->
     <div class="contenedor-input-referencia">
       <input
         type="text"
-        [(ngModel)]="filtroReferencia"
-        (input)="buscarPorReferencia()"
+        [(ngModel)]="filtroReferencia" 
+        (input)="buscarPorReferencia()" 
         (keydown.enter)="confirmarReferenciaConEnter()"
         [placeholder]="'Encabezado.BuscReferencia' | translate"
       />
-      <button (click)="limpiarFiltros()">{{'Encabezado.BtFiltro' | translate}}</button>
+      <button (click)="limpiarFiltros()">{{'Encabezado.BtFiltro' | translate}}</button><!-- Botón para limpiar filtros con texto traducido -->
 
-      <div *ngIf="mostrarResultadosFlotantes" class="ventana-resultados">
+      <div *ngIf="mostrarResultadosFlotantes" class="ventana-resultados"> <!-- Ventana emergente que se muestra si hay resultados para mostrar -->
         <div class="cabecera-ventana">
-          <h4>{{'Encabezado.VentanaEmergente' | translate}}</h4>
-          <button (click)="mostrarResultadosFlotantes = false" class="cerrar-ventana">✖</button>
+          <h4>{{'Encabezado.VentanaEmergente' | translate}}</h4> <!-- Título traducido de la ventana emergente -->
+          <button (click)="mostrarResultadosFlotantes = false" class="cerrar-ventana">✖</button> <!-- Botón para cerrar la ventana emergente -->
         </div>
         <ul class="lista-referencias">
           <li
-            *ngFor="let r of resultadosReferencia"
-            (click)="filtrarPorReferenciaSeleccionada(r)"
+            *ngFor="let r of resultadosReferencia" 
+            (click)="filtrarPorReferenciaSeleccionada(r)" 
             class="opcion-referencia"
           >
-            <strong>{{ r.referencia }}</strong> – {{ r.descripcion }}<br />
-            <small>ID: {{ r.referencia_Id }}</small>
-
+            <strong>{{ r.referencia }}</strong> – {{ r.descripcion }}<br /> <!-- Muestra referencia y descripción -->
+            <small>ID: {{ r.referencia_Id }}</small> <!-- Muestra el ID de referencia -->
           </li>
         </ul>
       </div>
-      <!-- Usuario -->
-<div class="contenedor-input-usuario">
+      
+<div class="contenedor-input-usuario"><!--campo de búsqueda para que el usuario escriba texto y se realice una búsqueda dinámica de usuarios. También responde al presionar Enter para confirmar la selección. El texto del placeholder se traduce según el idioma activo.-->
   <input
     type="text"
     [(ngModel)]="filtroUsuario"
@@ -98,7 +86,7 @@
     [placeholder]= "'Encabezado.BuscUsuario'| translate"
   />
 
-  <div *ngIf="mostrarUsuariosFlotantes" class="ventana-resultados">
+  <div *ngIf="mostrarUsuariosFlotantes" class="ventana-resultados"><!--Muestra una ventana emergente de los usuarios coincidentes-->
     <div class="cabecera-ventana">
       <h4>{{'Encabezado.VentanaEmergente' | translate}}</h4>
       <button (click)="mostrarUsuariosFlotantes = false" class="cerrar-ventana">✖</button>
@@ -120,7 +108,7 @@
     </div>
   </div>
 
-  <!-- Tabs -->
+  <!-- Pestañas Existentes -->
   <div class="tab-container">
     <button [class.active-tab]="vistaActiva === 'todas'" (click)="cambiarVista('todas')">{{'Pestanias.TarTodas' | translate}}</button>
     <button [class.active-tab]="vistaActiva === 'creadas'" (click)="cambiarVista('creadas')">{{'Pestanias.TarCreadas' | translate}}</button>
@@ -130,30 +118,28 @@
 
 
   <!-- Tablero Kanban -->
-  <div class="kanban-wrapper">
-    <div class="kanban-board">
-      <div class="column" *ngFor="let estado of obtenerEstadosUnicos()">
-        <div class="column-title">{{ estado }}</div>
-        <div class="task" *ngFor="let tarea of getTareasPorEstado(estado)">
-          <div class="task-prioridad" [ngStyle]="{ 'background-color': getColorPrioridad(tarea.nivel_Prioridad) }"></div>
-          <div class="task-content">
-            <strong>{{'Tareas.ID' | translate}}:</strong> {{ tarea.iD_Tarea }}<br />
-            <strong>{{'Tareas.Descripcion' | translate}}:</strong> {{ tarea.descripcion }}<br />
-            <strong>{{'Tareas.Tipo' | translate}}:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br />
-            <strong>{{'Tareas.Prioridad' | translate}}:</strong> {{ tarea.nom_Nivel_Prioridad }}<br />
-            <strong>{{'Tareas.Ref' | translate}}:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})<br />
-            <strong>{{'Tareas.Fecha' | translate}}:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}<br />
-            <strong>{{'Tareas.Invitados' | translate}}:</strong>
-            <span *ngIf="(tareaInvitados[tarea.iD_Tarea]?.length ?? 0) > 0">
-
-              {{ getPrimerInvitado(tarea.iD_Tarea) }}
-              <span *ngIf="getCantidadRestante(tarea.iD_Tarea) > 0"
-                    [title]="getRestoInvitadosTooltip(tarea.iD_Tarea)">
-                +{{ getCantidadRestante(tarea.iD_Tarea) }} más
+  <div class="kanban-wrapper"> <!-- Contenedor general que envuelve el tablero Kanban -->
+    <div class="kanban-board"> <!-- Contenedor del tablero Kanban donde se muestran las columnas -->
+      <div class="column" *ngFor="let estado of obtenerEstadosUnicos()"> <!-- Repite una columna por cada estado único obtenido de las tareas -->
+        <div class="column-title">{{ estado }}</div> <!-- Muestra el nombre del estado en el título de la columna -->
+        <div class="task" *ngFor="let tarea of getTareasPorEstado(estado)"> <!-- Repite una tarjeta para cada tarea filtrada que corresponde a este estado -->
+          <div class="task-prioridad" [ngStyle]="{ 'background-color': getColorPrioridad(tarea.nivel_Prioridad) }"></div> <!-- Indicador visual de prioridad con color dinámico -->
+          <div class="task-content"> <!-- Contenedor del contenido visible de la tarea -->
+            <strong>{{'Tareas.ID' | translate}}:</strong> {{ tarea.iD_Tarea }}<br /> <!-- Etiqueta "ID" traducida y valor de ID -->
+            <strong>{{'Tareas.Descripcion' | translate}}:</strong> {{ tarea.descripcion }}<br /> <!-- Etiqueta "Descripción" traducida y descripción -->
+            <strong>{{'Tareas.Tipo' | translate}}:</strong> {{ tarea.descripcion_Tipo_Tarea }}<br /> <!-- Etiqueta "Tipo" traducida y tipo -->
+            <strong>{{'Tareas.Prioridad' | translate}}:</strong> {{ tarea.nom_Nivel_Prioridad }}<br /> <!-- Etiqueta "Prioridad" traducida y nivel -->
+            <strong>{{'Tareas.Ref' | translate}}:</strong> {{ tarea.descripcion_Referencia }} ({{ tarea.referencia }})<br /> <!-- Etiqueta "Referencia" traducida y detalles -->
+            <strong>{{'Tareas.Fecha' | translate}}:</strong> {{ tarea.fecha_Inicial | date: 'dd/MM/yyyy HH:mm' }}<br /> <!-- Etiqueta "Fecha" traducida y fecha formateada -->
+            <strong>{{'Tareas.Invitados' | translate}}:</strong> <!-- Etiqueta "Invitados" traducida -->
+            <span *ngIf="(tareaInvitados[tarea.iD_Tarea]?.length ?? 0) > 0"> <!-- Si hay invitados para la tarea -->
+              {{ getPrimerInvitado(tarea.iD_Tarea) }} <!-- Mostrar el primer invitado -->
+              <span *ngIf="getCantidadRestante(tarea.iD_Tarea) > 0" [title]="getRestoInvitadosTooltip(tarea.iD_Tarea)"> <!-- Si hay más invitados, mostrar cantidad y tooltip -->
+                +{{ getCantidadRestante(tarea.iD_Tarea) }} más <!-- Texto indicando número de invitados adicionales -->
               </span>
             </span>
-            <span *ngIf="!tareaInvitados[tarea.iD_Tarea]?.length">
-              Sin invitado
+            <span *ngIf="!tareaInvitados[tarea.iD_Tarea]?.length"> <!-- Si no hay invitados -->
+              Sin invitado <!-- Mostrar texto indicando ausencia de invitados -->
             </span>
             </div> 
           </div> 
